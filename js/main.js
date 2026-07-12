@@ -386,8 +386,10 @@ function fileToBase64(file) {
 }
 
 async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec";
-  if (APPS_SCRIPT_URL) {
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec";
+
+  // PERBAIKAN: Tambahkan tanda seru (!) untuk mengecek jika URL kosong/belum diisi
+  if (!APPS_SCRIPT_URL) {
     statusEl.textContent = "Backend belum terhubung. Lihat README.md untuk deploy Code.gs.";
     statusEl.className = "form-status err";
     return false;
@@ -402,6 +404,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdE
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
+      // Penggunaan text/plain ini sudah SANGAT TEPAT untuk menghindari error CORS di Apps Script
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
