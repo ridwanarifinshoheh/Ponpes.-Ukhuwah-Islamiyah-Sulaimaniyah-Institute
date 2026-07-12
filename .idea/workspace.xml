@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="Script Updated">
-      <change beforePath="$PROJECT_DIR$/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/main.js" afterDir="false" />
+    <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="Script Updated.">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -301,7 +302,15 @@
       <option name="project" value="LOCAL" />
       <updated>1783866530917</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Script Updated.">
+      <option name="closed" value="true" />
+      <created>1783866829604</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1783866829604</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -321,6 +330,7 @@
     <MESSAGE value="Commit pembaharuan" />
     <MESSAGE value="Script" />
     <MESSAGE value="Script Updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="Script Updated" />
+    <MESSAGE value="Script Updated." />
+    <option name="LAST_COMMIT_MESSAGE" value="Script Updated." />
   </component>
 </project>
