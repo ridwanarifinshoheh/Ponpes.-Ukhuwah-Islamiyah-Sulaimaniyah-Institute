@@ -29,7 +29,7 @@ const SITE_DATA = {
     youtube: "https://youtube.com/@sulaimaniyahinstitute",
     mapsEmbedQuery: "Semarang, Jawa Tengah",
     jamOperasional: "Senin–Sabtu, 08.00–16.00 WIB",
-    sambutan: "Selamat datang di rumah kedua bagi putra-putri Muslim yang ingin tumbuh dalam naungan ilmu, adab, dan ukhuwah. Kami mendidik santri bukan hanya untuk pandai, tetapi juga untuk berakhlak dan bermanfaat bagi sesama.",
+    sambutan: "Inilah wasiatku atas dirimu: Janganlah kau terpecah belah. Janganlah membeda-bedakan suku bangsa. Janganlah engkau tersesat dengan mengikuti jalan selain Ahlu Sunnah wal Jamaah (Sunnah Nabi).",
     sejarah: "Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute adalah pesantren mahasiswa di bawah naungan Yayasan Tahfidz Sulaimaniyah yang dirancang khusus untuk memfasilitasi mahasiswa menyeimbangkan pendidikan akademik kampus dengan pendalaman ilmu agama Islam.",
     visi: "Mencetak generasi yang menerapkan Al-Qur’an dan Sunnah Rasulullah SAW dalam kehidupan sehari-hari guna mendapatkan Ridha Ilahi.",
     misi: [
