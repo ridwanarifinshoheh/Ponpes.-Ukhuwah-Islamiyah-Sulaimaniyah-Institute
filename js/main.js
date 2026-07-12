@@ -386,7 +386,7 @@ function fileToBase64(file) {
 }
 
 async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("https://script.google.com/macros/s/AKfycbzdvw_DpP-lFItoTzliFTArwf2ukeOw0mUK6TMkynpsXvHEz0Y11NFT_dRI3OR-7IDHMA/exec")) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbzdvw_DpP-lFItoTzliFTArwf2ukeOw0mUK6TMkynpsXvHEz0Y11NFT_dRI3OR-7IDHMA/exec')) {
     statusEl.textContent = "Backend belum terhubung. Lihat README.md untuk deploy Code.gs.";
     statusEl.className = "form-status err";
     return false;
