@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel Admin — Sulaimaniyah Institute</title>
+<link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="star-mark" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="31" fill="#0E3A30"/>
+    <g fill="none" stroke="#E7C77E" stroke-width="2">
+      <rect x="15" y="15" width="34" height="34"/>
+      <rect x="15" y="15" width="34" height="34" transform="rotate(45 32 32)"/>
+    </g>
+    <circle cx="32" cy="32" r="6" fill="#E7C77E"/>
+  </symbol>
+</svg>
+
+<!-- ==================== LOGIN GATE ==================== -->
+<div class="admin-shell" id="loginScreen">
+  <div class="admin-login">
+    <svg width="46" height="46" style="margin-inline:auto 12px"><use href="#star-mark"/></svg>
+    <h2 style="font-size:1.3rem;margin-bottom:6px">Panel Admin</h2>
+    <p style="font-size:.85rem;color:#5a7069;margin-bottom:22px">Khusus pengelola Sulaimaniyah Institute.</p>
+    <form id="loginForm">
+      <div class="field" style="margin-bottom:16px;text-align:left">
+        <label for="loginPass">Kata Sandi</label>
+        <input id="loginPass" type="password" required autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Masuk</button>
+      <p id="loginError" style="color:#A3402C;font-size:.82rem;margin-top:12px;min-height:1.2em"></p>
+    </form>
+    <p style="font-size:.76rem;color:#8a9a94;margin-top:18px">Lupa kata sandi? Ubah nilai <code>ADMIN_PASSWORD</code> di file <code>js/admin.js</code>.</p>
+    <a href="index.html" style="display:inline-block;margin-top:14px;font-size:.82rem;color:var(--emerald)">← Kembali ke website</a>
+  </div>
+</div>
+
+<!-- ==================== ADMIN SHELL ==================== -->
+<div class="admin-shell" id="adminScreen" hidden>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+    <div class="brand">
+      <svg class="brand-mark"><use href="#star-mark"/></svg>
+      <span class="brand-text">
+        <strong>Panel Admin</strong>
+        <span>Sulaimaniyah Institute</span>
+      </span>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a href="index.html" class="btn btn-outline btn-sm" target="_blank">Lihat Website</a>
+      <button class="btn btn-outline btn-sm" id="logoutBtn">Keluar</button>
+    </div>
+  </div>
+
+  <p class="admin-note">
+    <i class="fa-solid fa-circle-info"></i>&nbsp;
+    Perubahan di sini tersimpan <strong>hanya di browser ini</strong> (localStorage), sehingga langsung terlihat saat kamu membuka website dari komputer ini, tapi <strong>belum terlihat oleh pengunjung lain</strong>. Untuk menjadikannya permanen, buka tab <strong>Data &amp; Backup</strong>, unduh JSON, lalu salin isinya ke <code>js/data.js</code> dan push ke GitHub.
+  </p>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="galeri">Galeri Foto</button>
+    <button class="admin-tab" data-tab="berita">Berita &amp; Informasi</button>
+    <button class="admin-tab" data-tab="backup">Data &amp; Backup</button>
+    <button class="admin-tab" data-tab="formulir">Pendaftaran &amp; Donasi</button>
+  </div>
+
+  <!-- ---------- TAB: GALERI ---------- -->
+  <section class="admin-panel active" id="panel-galeri">
+    <h3 style="margin-bottom:18px">Tambah / Edit Foto</h3>
+    <form id="formGaleri">
+      <input type="hidden" id="g_id">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="g_judul">Judul Foto <span class="req">*</span></label>
+          <input id="g_judul" required>
+        </div>
+        <div class="field">
+          <label for="g_kategori">Kategori <span class="req">*</span></label>
+          <select id="g_kategori" required>
+            <option value="kegiatan">Kegiatan</option>
+            <option value="belajar">Belajar</option>
+            <option value="acara">Acara</option>
+            <option value="fasilitas">Fasilitas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="g_img">URL Gambar</label>
+          <input id="g_img" placeholder="https://... atau assets/images/nama.jpg">
+        </div>
+        <div class="field full">
+          <label for="g_file">Atau unggah file (pratinjau cepat — disimpan sebagai base64 di browser ini)</label>
+          <input id="g_file" type="file" accept="image/*">
+          <small>Untuk web publik permanen, sebaiknya pakai URL gambar yang sudah kamu unggah ke repo/hosting.</small>
+        </div>
+      </div>
+      <div class="form-foot">
+        <button type="button" class="btn btn-outline btn-sm" id="g_cancel" hidden>Batal Edit</button>
+        <button type="submit" class="btn btn-primary" id="g_submit">Tambah Foto</button>
+      </div>
+    </form>
+    <div class="admin-list" id="listGaleri"></div>
+  </section>
+
+  <!-- ---------- TAB: BERITA ---------- -->
+  <section class="admin-panel" id="panel-berita">
+    <h3 style="margin-bottom:18px">Tambah / Edit Berita</h3>
+    <form id="formBerita">
+      <input type="hidden" id="b_id">
+      <div class="form-grid">
+        <div class="field full">
+          <label for="b_judul">Judul <span class="req">*</span></label>
+          <input id="b_judul" required>
+        </div>
+        <div class="field">
+          <label for="b_kategori">Kategori <span class="req">*</span></label>
+          <select id="b_kategori" required>
+            <option value="pengumuman">Pengumuman</option>
+            <option value="kegiatan">Kegiatan</option>
+            <option value="artikel">Artikel</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="b_tanggal">Tanggal <span class="req">*</span></label>
+          <input id="b_tanggal" type="date" required>
+        </div>
+        <div class="field full">
+          <label for="b_ringkasan">Ringkasan Singkat <span class="req">*</span></label>
+          <textarea id="b_ringkasan" rows="2" required></textarea>
+        </div>
+        <div class="field full">
+          <label for="b_isi">Isi Lengkap <span class="req">*</span></label>
+          <textarea id="b_isi" rows="5" required></textarea>
+        </div>
+      </div>
+      <div class="form-foot">
+        <button type="button" class="btn btn-outline btn-sm" id="b_cancel" hidden>Batal Edit</button>
+        <button type="submit" class="btn btn-primary" id="b_submit">Tambah Berita</button>
+      </div>
+    </form>
+    <div class="admin-list" id="listBerita"></div>
+  </section>
+
+  <!-- ---------- TAB: BACKUP ---------- -->
+  <section class="admin-panel" id="panel-backup">
+    <h3 style="margin-bottom:10px">Export &amp; Import Data</h3>
+    <p style="font-size:.9rem;color:#4a615a;margin-bottom:22px">
+      Gunakan <strong>Export</strong> untuk mengunduh seluruh perubahan Galeri &amp; Berita di browser ini sebagai file JSON —
+      simpan sebagai cadangan, atau salin isinya ke <code>js/data.js</code> agar permanen untuk semua pengunjung.
+      Gunakan <strong>Import</strong> untuk memuat kembali file cadangan (misalnya di komputer/browser lain).
+    </p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="exportBtn"><i class="fa-solid fa-download"></i>&nbsp; Export JSON</button>
+      <label class="btn btn-outline" style="cursor:pointer">
+        <i class="fa-solid fa-upload"></i>&nbsp; Import JSON
+        <input type="file" id="importFile" accept="application/json" hidden>
+      </label>
+      <button class="btn btn-outline" id="resetBtn" style="border-color:#A3402C;color:#A3402C">
+        <i class="fa-solid fa-trash"></i>&nbsp; Hapus Semua Perubahan Lokal
+      </button>
+    </div>
+  </section>
+
+  <!-- ---------- TAB: FORMULIR ---------- -->
+  <section class="admin-panel" id="panel-formulir">
+    <h3 style="margin-bottom:10px">Data Pendaftaran &amp; Donasi</h3>
+    <p style="font-size:.9rem;color:#4a615a">
+      Data formulir <strong>Pendaftaran Santri</strong> dan <strong>Konfirmasi Donasi</strong> dari pengunjung tersimpan otomatis
+      ke Google Sheets melalui backend Apps Script (Code.gs) — bukan di browser ini.
+      Buka Google Sheets yang terhubung ke deployment Code.gs kamu untuk melihat, mengekspor ke Excel/CSV, atau
+      mengunduhnya ke komputer kapan saja. Lihat README.md bagian "Menghubungkan Code.gs" untuk link Sheet kamu.
+    </p>
+  </section>
+</div>
+
+<div class="admin-toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
