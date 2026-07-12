@@ -30,13 +30,12 @@ const SITE_DATA = {
     mapsEmbedQuery: "Semarang, Jawa Tengah",
     jamOperasional: "Senin–Sabtu, 08.00–16.00 WIB",
     sambutan: "Selamat datang di rumah kedua bagi putra-putri Muslim yang ingin tumbuh dalam naungan ilmu, adab, dan ukhuwah. Kami mendidik santri bukan hanya untuk pandai, tetapi juga untuk berakhlak dan bermanfaat bagi sesama.",
-    sejarah: "Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute didirikan atas semangat menyatukan pendidikan agama yang kokoh dengan wawasan keilmuan modern. Bermula dari majelis taklim sederhana, kini berkembang menjadi lembaga pendidikan yang mengasuh santri dari berbagai daerah dengan tetap menjaga nilai kekeluargaan dan ukhuwah islamiyah.",
-    visi: "Menjadi lembaga pendidikan Islam yang melahirkan generasi berilmu, berakhlak mulia, dan bermanfaat bagi umat.",
+    sejarah: "Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute adalah pesantren mahasiswa di bawah naungan Yayasan Tahfidz Sulaimaniyah yang dirancang khusus untuk memfasilitasi mahasiswa menyeimbangkan pendidikan akademik kampus dengan pendalaman ilmu agama Islam.",
+    visi: "Mencetak generasi yang menerapkan Al-Qur’an dan Sunnah Rasulullah SAW dalam kehidupan sehari-hari guna mendapatkan Ridha Ilahi.",
     misi: [
-      "Menyelenggarakan pendidikan diniyah dan formal yang seimbang",
-      "Membina akhlak santri melalui keteladanan dan kedisiplinan",
+      "Pendalaman komprehensif mengenai ilmu fikih, tauhid, nahwu, dan sharaf.",
+      "Pembinaan adab dan akhlak keseharian, serta penguasaan bahasa Arab dan bahasa Turki.",
       "Menumbuhkan semangat ukhuwah islamiyah antar santri dan masyarakat",
-      "Membekali santri dengan kecakapan hidup dan wawasan sosial"
     ]
   },
 
@@ -50,7 +49,7 @@ const SITE_DATA = {
   fasilitas: [
     { icon: "mosque", judul: "Masjid & Aula Utama", deskripsi: "Pusat ibadah dan kegiatan keagamaan santri, menampung lebih dari 500 jamaah." },
     { icon: "book", judul: "Perpustakaan & Ruang Kitab", deskripsi: "Koleksi kitab kuning, buku pelajaran umum, dan ruang baca yang nyaman." },
-    { icon: "home", judul: "Asrama Putra & Putri", deskripsi: "Asrama terpisah dengan pembina yang mendampingi keseharian santri." },
+    { icon: "home", judul: "Asrama Putra", deskripsi: "Asrama terpisah dengan pembina yang mendampingi keseharian santri." },
     { icon: "flask", judul: "Laboratorium & Ruang Kelas", deskripsi: "Ruang belajar formal dengan fasilitas penunjang sains dan komputer." },
     { icon: "heart", judul: "Klinik Kesehatan Santri", deskripsi: "Layanan kesehatan dasar dan pemantauan gizi santri secara rutin." },
     { icon: "ball", judul: "Lapangan Olahraga", deskripsi: "Area olahraga untuk menjaga kebugaran jasmani santri." }
@@ -127,9 +126,8 @@ const SITE_DATA = {
   ],
 
   faq: [
-    { q: "Berapa biaya pendaftaran santri baru?", a: "Rincian biaya pendaftaran dan syahriah dapat ditanyakan langsung melalui WhatsApp panitia, karena dapat berubah tiap tahun ajaran." },
-    { q: "Apakah pesantren menerima santri dari luar kota/provinsi?", a: "Ya, pesantren menerima santri dari seluruh Indonesia. Panitia akan membantu proses penjemputan/informasi akomodasi bila diperlukan." },
+    { q: "Berapa biaya pendaftaran santri baru?", a: "Rincian biaya pendaftaran dan syahriah dapat ditanyakan langsung melalui WhatsApp pengurus pesantren, karena dapat berubah tiap tahun ajaran." },
     { q: "Bagaimana cara memastikan donasi saya sudah diterima?", a: "Setelah transfer, silakan isi formulir konfirmasi donasi pada halaman ini agar tercatat, atau kirim bukti transfer melalui WhatsApp." },
-    { q: "Apakah ada program beasiswa untuk santri kurang mampu?", a: "Ada, melalui program Beasiswa Yatim & Dhuafa yang didanai dari donasi masyarakat. Silakan hubungi panitia untuk informasi pendaftaran beasiswa." }
+    { q: "Apakah ada program beasiswa untuk melanjutkan studi ke Turki?", a: "Ada, melalui program beasiswa yang didanai dari donasi para donatur dan dermawan. Silakan hubungi panitia untuk informasi lebih lanjut." }
   ]
 };
