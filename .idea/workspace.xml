@@ -29,12 +29,12 @@
     &quot;assignee&quot;: &quot;ridwanarifinshoheh&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ridwanarifinshoheh/Ukhuwah-Islamiyah-Sulaimaniyah-Intitute.git",
-    "accountId": "2247a166-1506-4b3f-819d-3ee2fdc629cf"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ridwanarifinshoheh/Ukhuwah-Islamiyah-Sulaimaniyah-Intitute.git&quot;,
+    &quot;accountId&quot;: &quot;2247a166-1506-4b3f-819d-3ee2fdc629cf&quot;
   }
-}]]></component>
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -49,18 +49,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Notification.DisplayName-DoNotAsk-vcs.commit.finished": "2 files committed",
-    "Notification.DoNotAsk-vcs.commit.finished": "true",
-    "Python.main.js.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/macbookair/Downloads/Website Pesma Sulaimaniyah Semarang"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Notification.DisplayName-DoNotAsk-vcs.commit.finished&quot;: &quot;2 files committed&quot;,
+    &quot;Notification.DoNotAsk-vcs.commit.finished&quot;: &quot;true&quot;,
+    &quot;Python.main.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/macbookair/Downloads/Website Pesma Sulaimaniyah Semarang&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="main.js" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="UjiCoba" />
