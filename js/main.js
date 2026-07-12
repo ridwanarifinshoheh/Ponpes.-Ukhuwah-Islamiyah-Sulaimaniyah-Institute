@@ -387,7 +387,7 @@ function fileToBase64(file) {
 
 async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQr951EWeMudHKC2NLqxN6GIHYxJBSyKagfUmdXHBAaKN9OAui6Mc5pzZadbtBJRcm/exec";
-  if (!APPS_SCRIPT_URL) {
+  if (APPS_SCRIPT_URL) {
     statusEl.textContent = "Backend belum terhubung. Lihat README.md untuk deploy Code.gs.";
     statusEl.className = "form-status err";
     return false;
