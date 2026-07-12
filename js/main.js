@@ -386,24 +386,28 @@ function fileToBase64(file) {
 }
 
 async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQr951EWeMudHKC2NLqxN6GIHYxJBSyKagfUmdXHBAaKN9OAui6Mc5pzZadbtBJRcm/exec";
-  if (APPS_SCRIPT_URL) {
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyQr951EWeMudHKC2NLqxN6GIHYxJBSyKagfUmdXHBAaKN9OAui6Mc5pzZadbtBJRcm/exec";
+  if (!APPS_SCRIPT_URL) {
     statusEl.textContent = "Backend belum terhubung. Lihat README.md untuk deploy Code.gs.";
     statusEl.className = "form-status err";
     return false;
   }
+
   btnEl.disabled = true;
   const originalLabel = btnEl.textContent;
   btnEl.textContent = "Mengirim...";
   statusEl.textContent = "";
   statusEl.className = "form-status";
+
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // hindari CORS preflight — lihat README
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
+
     const data = await res.json();
+
     if (data && data.status === "ok") {
       statusEl.textContent = pesanSukses;
       statusEl.className = "form-status ok";
