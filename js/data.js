@@ -41,7 +41,7 @@ const SITE_DATA = {
 
   statistik: [
     { label: "Santri Aktif", nilai: 420, suffix: "+" },
-    { label: "Tenaga Pengajar", nilai: 38, suffix: "" },
+    { label: "Tenaga Pengajar", nilai: 4, suffix: "" },
     { label: "Alumni", nilai: 1650, suffix: "+" },
     { label: "Tahun Pengabdian", nilai: new Date().getFullYear() - 2005, suffix: "" }
   ],
