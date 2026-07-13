@@ -66,7 +66,7 @@ const SITE_DATA = {
     { id: "g4", judul: "Wisuda Tahfidz Angkatan", kategori: "acara", img: "" },
     { id: "g5", judul: "Praktikum Laboratorium", kategori: "belajar", img: "" },
     { id: "g6", judul: "Turnamen Olahraga Santri", kategori: "kegiatan", img: "" },
-    { id: "g7", judul: "Suasana Asrama Putri", kategori: "fasilitas", img: "" },
+    { id: "g7", judul: "Suasana Pesantren", kategori: "fasilitas", img: "" },
     { id: "g8", judul: "Bakti Sosial Ramadhan", kategori: "kegiatan", img: "" }
   ],
 
@@ -108,15 +108,14 @@ const SITE_DATA = {
   ],
 
   donasiProgram: [
-    { icon: "coin", judul: "Infaq Operasional", deskripsi: "Mendukung biaya operasional harian pesantren dan kebutuhan santri dhuafa." },
-    { icon: "building", judul: "Wakaf Pembangunan", deskripsi: "Pembangunan dan renovasi sarana belajar, asrama, dan masjid." },
-    { icon: "scholar", judul: "Beasiswa Yatim & Dhuafa", deskripsi: "Membiayai pendidikan santri yatim dan kurang mampu agar tetap dapat menuntut ilmu." },
+    { icon: "coin", judul: "Infaq Operasional", deskripsi: "Mendukung biaya operasional harian pesantren dan kebutuhan mahasantri berprestasi." },
+    { icon: "building", judul: "Wakaf Pembangunan", deskripsi: "Pembangunan dan renovasi sarana belajar, asrama, masjid dan lainnya." },
+    { icon: "scholar", judul: "Beasiswa Santri Ke Turki", deskripsi: "Membiayai kebutuhan harian mahasantri selama masa pendidikan di Turki." },
     { icon: "hands", judul: "Sosial & Kemanusiaan", deskripsi: "Bantuan bencana, kesehatan, dan kegiatan sosial kemasyarakatan sekitar pesantren." }
   ],
 
   rekening: [
-    { bank: "Bank Syariah Indonesia (BSI)", nomor: "7123456789", atasNama: "Yayasan Ukhuwah Islamiyah Sulaimaniyah" },
-    { bank: "Bank Mandiri", nomor: "1350012345678", atasNama: "Yayasan Ukhuwah Islamiyah Sulaimaniyah" }
+    { bank: "Bank Syariah Indonesia (BSI)", nomor: "723124341", atasNama: "Yayasan Sulaimaniyah Jawa Tengah" },
   ],
 
   testimoni: [
