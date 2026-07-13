@@ -27,7 +27,7 @@ const SITE_DATA = {
     instagram: "https://instagram.com/sulaimaniyah.institute",
     facebook: "https://facebook.com/sulaimaniyahinstitute",
     youtube: "https://youtube.com/@sulaimaniyahinstitute",
-    mapsEmbedQuery: "Semarang, Jawa Tengah",
+    mapsEmbedQuery: "Masjid Ukhuwah Islamiyah El Azhar",
     jamOperasional: "Senin–Sabtu, 08.00–16.00 WIB",
     sambutan: "Inilah wasiatku atas dirimu: Janganlah kau terpecah belah. Janganlah membeda-bedakan suku bangsa. Janganlah engkau tersesat dengan mengikuti jalan selain Ahlu Sunnah wal Jamaah (Sunnah Nabi).",
     sejarah: "Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute adalah pesantren mahasiswa di bawah naungan Yayasan Tahfidz Sulaimaniyah yang dirancang khusus untuk memfasilitasi mahasiswa menyeimbangkan pendidikan akademik kampus dengan pendalaman ilmu agama Islam.",
@@ -121,8 +121,8 @@ const SITE_DATA = {
 
   testimoni: [
     { nama: "Bapak Ahmad Fauzi", peran: "Wali Santri, Kelas Aliyah", isi: "Alhamdulillah, perkembangan akhlak dan hafalan anak saya sangat terasa sejak mondok di sini. Pembina sangat perhatian pada setiap santri." },
-    { nama: "Siti Aminah", peran: "Alumni 2019", isi: "Pesantren ini mengajarkan saya arti ukhuwah yang sesungguhnya. Ilmu agama dan umum berjalan seimbang, bekal saya hingga kuliah." },
-    { nama: "Bapak Hasan Basri", peran: "Wali Santri, Kelas Tsanawiyah", isi: "Fasilitas memadai, lingkungan aman, dan komunikasi dengan wali santri selalu terbuka. Kami merasa tenang menitipkan putra kami di sini." }
+    { nama: "Bapak Ahmad Fauzi", peran: "Wali Santri, Kelas Aliyah", isi: "Alhamdulillah, perkembangan akhlak dan hafalan anak saya sangat terasa sejak mondok di sini. Pembina sangat perhatian pada setiap santri." },
+    { nama: "Bapak Ahmad Fauzi", peran: "Wali Santri, Kelas Aliyah", isi: "Alhamdulillah, perkembangan akhlak dan hafalan anak saya sangat terasa sejak mondok di sini. Pembina sangat perhatian pada setiap santri." },
   ],
 
   faq: [

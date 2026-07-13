@@ -97,7 +97,7 @@ function animateCounters() {
 function renderAbout() {
   document.getElementById("aboutSejarah").textContent = SITE_DATA.profil.sejarah;
   document.getElementById("aboutSambutan").innerHTML =
-    `“${SITE_DATA.profil.sambutan}”<footer>— Pengasuh Pesantren</footer>`;
+    `“${SITE_DATA.profil.sambutan}”<footer>— Syeikh Sulaiman Hilmi Tunahan qs. (Pendiri)</footer>`;
   document.getElementById("aboutVisi").textContent = SITE_DATA.profil.visi;
 
   const list = document.getElementById("aboutMisi");
