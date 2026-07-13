@@ -15,7 +15,7 @@
 const SITE_DATA = {
 
   profil: {
-    nama: "Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute",
+    nama: "Ponpes. Ukhuwah Islamiyah Sulaimaniyah Institute",
     motto: "بِالْعِلْمِ وَالْأُخُوَّةِ نَبْنِي الْأُمَّةَ",
     mottoTerjemahan: "Dengan ilmu dan ukhuwah, kami membangun umat",
     tahunBerdiri: 2005,
