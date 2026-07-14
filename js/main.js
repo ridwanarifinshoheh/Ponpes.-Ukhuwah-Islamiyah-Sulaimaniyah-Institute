@@ -2,16 +2,13 @@
  * main.js — Logika halaman utama Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute
  * ------------------------------------------------------------------------------
  * 1. TEMPEL URL WEB APP APPS SCRIPT KAMU DI BAWAH INI setelah deploy Code.gs.
- *    Lihat README.md bagian "Menghubungkan Code.gs (backend)".
+ * Lihat README.md bagian "Menghubungkan Code.gs (backend)".
  */
 const APPS_SCRIPT_URL = "PASTE_URL_WEB_APP_APPS_SCRIPT_DI_SINI";
 let currentLang = 'id';
+
 /* ============================================================
-   0. Util: gabungkan data dasar (data.js) dengan "lapisan admin"
-   yang tersimpan di localStorage (ditulis oleh admin.html).
-   Kontrak penyimpanan (harus sama persis dengan admin.js):
-     - psi_overlay_<jenis>  -> object { [id]: item }
-     - psi_deleted_<jenis>  -> array of id yang disembunyikan
+   0. Util: Gabung data, format, dan lokalisasi (Multi-Bahasa)
    ============================================================ */
 function mergeWithOverlay(baseArray, jenis) {
   let overlay = {};
@@ -24,6 +21,13 @@ function mergeWithOverlay(baseArray, jenis) {
   Object.values(overlay).forEach(item => map.set(item.id, item));
   deleted.forEach(id => map.delete(id));
   return Array.from(map.values());
+}
+
+// Helper: Ambil data berdasarkan bahasa yang aktif
+function getLoc(obj, key) {
+  if (currentLang === 'id') return obj[key];
+  const locKey = key + '_' + currentLang;
+  return obj[locKey] || obj[key]; // Jika terjemahan kosong, fallback ke bahasa Indonesia
 }
 
 const ICONS = {
@@ -40,7 +44,8 @@ function el(html) {
 }
 function formatTanggal(iso) {
   try {
-    return new Date(iso).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    const locales = { id: 'id-ID', en: 'en-US', tr: 'tr-TR' };
+    return new Date(iso).toLocaleDateString(locales[currentLang] || 'id-ID', { day: "numeric", month: "long", year: "numeric" });
   } catch (e) { return iso; }
 }
 function formatRupiah(n) {
@@ -59,7 +64,7 @@ function renderMeta() {
   document.getElementById("fabWa").href = `https://wa.me/${wa}?text=${encodeURIComponent("Assalamu'alaikum, saya ingin bertanya seputar " + SITE_DATA.profil.nama)}`;
 
   document.getElementById("mapFrame").querySelector("iframe").src =
-    `https://www.google.com/maps?q=${encodeURIComponent(SITE_DATA.profil.mapsEmbedQuery)}&output=embed`;
+    `https://maps.google.com/maps?q=${encodeURIComponent(SITE_DATA.profil.mapsEmbedQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 }
 
 /* ============================================================
@@ -67,18 +72,16 @@ function renderMeta() {
    ============================================================ */
 function renderStats() {
   const wrap = document.getElementById("statsGrid");
-  wrap.innerHTML = ""; // Bersihkan kontainer sebelum merender ulang
+  wrap.innerHTML = "";
   SITE_DATA.statistik.forEach(s => {
-    // Tentukan label mana yang dipakai berdasarkan currentLang
-    const label = currentLang === 'id' ? s.label : (currentLang === 'en' ? s.label_en : s.label_tr);
+    const label = getLoc(s, 'label');
     wrap.appendChild(el(`
       <div class="stat">
         <strong data-count="${s.nilai}" data-suffix="${s.suffix}">0</strong>
         <span>${label}</span>
       </div>`));
   });
-  // Jangan lupa panggil fungsi animasi setelah merender ulang
-  animateCounters();
+  animateCounters(); // Trigger animasi setiap kali di-render ulang
 }
 function animateCounters() {
   document.querySelectorAll("[data-count]").forEach(node => {
@@ -100,20 +103,20 @@ function animateCounters() {
    3. Tentang
    ============================================================ */
 function renderAbout() {
-  // Ambil teks sesuai bahasa aktif
   const p = SITE_DATA.profil;
-  const sejarah = currentLang === 'id' ? p.sejarah : (currentLang === 'en' ? p.sejarah_en : p.sejarah_tr);
-  const visi = currentLang === 'id' ? p.visi : (currentLang === 'en' ? p.visi_en : p.visi_tr);
+  document.getElementById("aboutSejarah").textContent = getLoc(p, 'sejarah');
+  document.getElementById("aboutVisi").textContent = getLoc(p, 'visi');
 
-  document.getElementById("aboutSejarah").textContent = sejarah;
-  // (Lakukan hal yang sama untuk sambutan jika ada terjemahannya)
-
-  document.getElementById("aboutVisi").textContent = visi;
+  const labelPendiri = { id: "Pendiri", en: "Founder", tr: "Kurucu" }[currentLang];
+  document.getElementById("aboutSambutan").innerHTML = `
+    "${getLoc(p, 'sambutan')}"
+    <footer>— Syeikh Sulaiman Hilmi Tunahan Q.S || ${labelPendiri}</footer>
+  `;
 
   const list = document.getElementById("aboutMisi");
-  list.innerHTML = ""; // Bersihkan
+  list.innerHTML = "";
   p.misi.forEach(m => {
-    const teksMisi = currentLang === 'id' ? m.id : (currentLang === 'en' ? m.en : m.tr);
+    const teksMisi = m[currentLang] || m.id;
     list.appendChild(el(`<li><span class="ic"><i class="fa-solid fa-check"></i></span><span>${teksMisi}</span></li>`));
   });
 }
@@ -123,12 +126,13 @@ function renderAbout() {
    ============================================================ */
 function renderFasilitas() {
   const wrap = document.getElementById("facilityGrid");
+  wrap.innerHTML = "";
   SITE_DATA.fasilitas.forEach(f => {
     wrap.appendChild(el(`
       <div class="facility-card reveal in">
         <div class="facility-ic"><i class="fa-solid ${ICONS[f.icon] || "fa-star"}"></i></div>
-        <h3>${f.judul}</h3>
-        <p>${f.deskripsi}</p>
+        <h3>${getLoc(f, 'judul')}</h3>
+        <p>${getLoc(f, 'deskripsi')}</p>
       </div>`));
   });
 }
@@ -136,52 +140,68 @@ function renderFasilitas() {
 /* ============================================================
    5. Galeri (filter + lightbox)
    ============================================================ */
-const GALLERY_LABELS = { semua: "Semua", kegiatan: "Kegiatan", belajar: "Belajar", acara: "Acara", fasilitas: "Fasilitas" };
+const GALLERY_LABELS = {
+  id: { semua: "Semua", kegiatan: "Kegiatan", belajar: "Belajar", acara: "Acara", fasilitas: "Fasilitas" },
+  en: { semua: "All", kegiatan: "Activities", belajar: "Learning", acara: "Events", fasilitas: "Facilities" },
+  tr: { semua: "Tümü", kegiatan: "Faaliyetler", belajar: "Eğitim", acara: "Etkinlikler", fasilitas: "Tesisler" }
+};
 let galleryData = [];
+let currentGalleryFilter = "semua";
 
 function renderGalleryFilters() {
   const cats = ["semua", ...new Set(galleryData.map(g => g.kategori))];
   const wrap = document.getElementById("galleryFilters");
-  cats.forEach((c, i) => {
-    const btn = el(`<button class="gfilter ${i === 0 ? "active" : ""}" data-cat="${c}">${GALLERY_LABELS[c] || c}</button>`);
+  wrap.innerHTML = "";
+  cats.forEach((c) => {
+    const label = GALLERY_LABELS[currentLang][c] || GALLERY_LABELS['id'][c] || c;
+    const btn = el(`<button class="gfilter ${c === currentGalleryFilter ? "active" : ""}" data-cat="${c}">${label}</button>`);
     btn.addEventListener("click", () => {
       document.querySelectorAll(".gfilter").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
+      currentGalleryFilter = c;
       renderGalleryGrid(c);
     });
     wrap.appendChild(btn);
   });
 }
+
 function renderGalleryGrid(filter) {
   const grid = document.getElementById("galleryGrid");
   const empty = document.getElementById("galleryEmpty");
   grid.innerHTML = "";
   const items = filter === "semua" ? galleryData : galleryData.filter(g => g.kategori === filter);
   empty.hidden = items.length > 0;
+
   items.forEach(g => {
+    const judul = getLoc(g, 'judul');
     const card = el(`
-      <div class="gitem" tabindex="0" role="button" aria-label="Lihat foto: ${g.judul}">
+      <div class="gitem" tabindex="0" role="button" aria-label="Lihat foto: ${judul}">
         ${g.img
-          ? `<img src="${g.img}" alt="${g.judul}" loading="lazy">`
+          ? `<img src="${g.img}" alt="${judul}" loading="lazy">`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--emerald-soft);color:var(--emerald)"><i class="fa-solid fa-image" style="font-size:1.6rem"></i></div>`}
-        <span class="gcap">${g.judul}</span>
+        <span class="gcap">${judul}</span>
       </div>`);
-    const open = () => openLightbox(g);
+
+    const open = () => {
+      document.getElementById("lightboxImg").src = g.img || "";
+      document.getElementById("lightboxImg").alt = judul;
+      document.getElementById("lightboxCap").textContent = judul;
+      document.getElementById("lightbox").classList.add("open");
+    };
+
     card.addEventListener("click", open);
     card.addEventListener("keypress", e => { if (e.key === "Enter") open(); });
     grid.appendChild(card);
   });
 }
-function openLightbox(g) {
-  document.getElementById("lightboxImg").src = g.img || "";
-  document.getElementById("lightboxImg").alt = g.judul;
-  document.getElementById("lightboxCap").textContent = g.judul;
-  document.getElementById("lightbox").classList.add("open");
-}
-function initGallery() {
+
+function renderGallery() {
   galleryData = mergeWithOverlay(SITE_DATA.galeri, "galeri");
   renderGalleryFilters();
-  renderGalleryGrid("semua");
+  renderGalleryGrid(currentGalleryFilter);
+}
+
+function initGallery() {
   document.getElementById("lightboxClose").addEventListener("click", () => document.getElementById("lightbox").classList.remove("open"));
   document.getElementById("lightbox").addEventListener("click", e => { if (e.target.id === "lightbox") e.currentTarget.classList.remove("open"); });
 }
@@ -189,28 +209,42 @@ function initGallery() {
 /* ============================================================
    6. Berita / Informasi
    ============================================================ */
-function initNews() {
+function renderNews() {
   const items = mergeWithOverlay(SITE_DATA.berita, "berita").sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
   const grid = document.getElementById("newsGrid");
+  grid.innerHTML = "";
+  const moreLabel = { id: "Baca selengkapnya", en: "Read more", tr: "Devamını oku" }[currentLang];
+
   items.forEach(n => {
+    const judul = getLoc(n, 'judul');
+    const ringkasan = getLoc(n, 'ringkasan');
+    const isi = getLoc(n, 'isi');
+
     const card = el(`
-      <article class="news-card">
+      <article class="news-card" role="button" tabindex="0">
         <div class="news-thumb"><i class="fa-solid ${NEWS_ICONS[n.kategori] || "fa-newspaper"}"></i></div>
         <div class="news-body">
           <div class="news-meta"><span>${n.kategori}</span><span>·</span><span>${formatTanggal(n.tanggal)}</span></div>
-          <h3>${n.judul}</h3>
-          <p>${n.ringkasan}</p>
-          <span class="news-more">Baca selengkapnya <i class="fa-solid fa-arrow-right"></i></span>
+          <h3>${judul}</h3>
+          <p>${ringkasan}</p>
+          <span class="news-more">${moreLabel} <i class="fa-solid fa-arrow-right"></i></span>
         </div>
       </article>`);
-    card.addEventListener("click", () => {
+
+    const openModal = () => {
       document.getElementById("newsModalMeta").textContent = `${n.kategori} · ${formatTanggal(n.tanggal)}`;
-      document.getElementById("newsModalTitle").textContent = n.judul;
-      document.getElementById("newsModalBody").textContent = n.isi;
+      document.getElementById("newsModalTitle").textContent = judul;
+      document.getElementById("newsModalBody").textContent = isi;
       document.getElementById("newsModal").classList.add("open");
-    });
+    };
+
+    card.addEventListener("click", openModal);
+    card.addEventListener("keypress", e => { if (e.key === "Enter") openModal(); });
     grid.appendChild(card);
   });
+}
+
+function initNews() {
   document.getElementById("newsModalClose").addEventListener("click", () => document.getElementById("newsModal").classList.remove("open"));
   document.getElementById("newsModal").addEventListener("click", e => { if (e.target.id === "newsModal") e.currentTarget.classList.remove("open"); });
 }
@@ -220,19 +254,28 @@ function initNews() {
    ============================================================ */
 function renderDonasi() {
   const wrap = document.getElementById("donationPrograms");
+  wrap.innerHTML = "";
+
+  const select = document.getElementById("d_program");
+  const optDefault = { id: "Pilih program", en: "Select program", tr: "Program seçin" }[currentLang];
+  select.innerHTML = `<option value="">${optDefault}</option>`;
+
   SITE_DATA.donasiProgram.forEach(p => {
+    const judul = getLoc(p, 'judul');
     wrap.appendChild(el(`
       <div class="dprogram">
         <div class="ic"><i class="fa-solid ${ICONS[p.icon] || "fa-hand-holding-heart"}"></i></div>
-        <h3>${p.judul}</h3>
-        <p>${p.deskripsi}</p>
+        <h3>${judul}</h3>
+        <p>${getLoc(p, 'deskripsi')}</p>
       </div>`));
+    select.appendChild(el(`<option value="${judul}">${judul}</option>`));
   });
 
-  const select = document.getElementById("d_program");
-  SITE_DATA.donasiProgram.forEach(p => select.appendChild(el(`<option value="${p.judul}">${p.judul}</option>`)));
-
   const bankList = document.getElementById("bankList");
+  bankList.innerHTML = "";
+  const copyText = { id: "Salin", en: "Copy", tr: "Kopyala" }[currentLang];
+  const copiedText = { id: "Tersalin!", en: "Copied!", tr: "Kopyalandı!" }[currentLang];
+
   SITE_DATA.rekening.forEach(r => {
     const row = el(`
       <div class="bank-row">
@@ -240,12 +283,13 @@ function renderDonasi() {
           <strong>${r.nomor}</strong>
           <span>${r.bank} — a.n. ${r.atasNama}</span>
         </div>
-        <button type="button" class="copy-btn">Salin</button>
+        <button type="button" class="copy-btn">${copyText}</button>
       </div>`);
+
     row.querySelector(".copy-btn").addEventListener("click", (e) => {
       navigator.clipboard.writeText(r.nomor).then(() => {
-        e.target.textContent = "Tersalin!";
-        setTimeout(() => (e.target.textContent = "Salin"), 1500);
+        e.target.textContent = copiedText;
+        setTimeout(() => (e.target.textContent = copyText), 1500);
       });
     });
     bankList.appendChild(row);
@@ -255,55 +299,73 @@ function renderDonasi() {
 /* ============================================================
    8. Testimoni slider
    ============================================================ */
-function initTesti() {
+let testiIndex = 0;
+let testiAuto;
+
+function renderTesti() {
   const track = document.getElementById("testiTrack");
   const dots = document.getElementById("testiDots");
-  let index = 0;
+  track.innerHTML = "";
+  dots.innerHTML = "";
 
   SITE_DATA.testimoni.forEach((t, i) => {
     track.appendChild(el(`
       <div class="testi-card">
-        <p>“${t.isi}”</p>
+        <p>“${getLoc(t, 'isi')}”</p>
         <div class="testi-avatar">${t.nama.charAt(0)}</div>
         <div class="testi-name">${t.nama}</div>
-        <div class="testi-role">${t.peran}</div>
+        <div class="testi-role">${getLoc(t, 'peran')}</div>
       </div>`));
-    const dot = el(`<button class="testi-dot ${i === 0 ? "active" : ""}" aria-label="Testimoni ${i + 1}"></button>`);
-    dot.addEventListener("click", () => goTo(i));
+
+    const dot = el(`<button class="testi-dot ${i === testiIndex ? "active" : ""}" aria-label="Testimoni ${i + 1}"></button>`);
+    dot.addEventListener("click", () => goToTesti(i));
     dots.appendChild(dot);
   });
+  goToTesti(testiIndex); // Ensure active states are accurate upon re-render
+}
 
-  function goTo(i) {
-    index = (i + SITE_DATA.testimoni.length) % SITE_DATA.testimoni.length;
-    track.style.transform = `translateX(-${index * 100}%)`;
-    document.querySelectorAll(".testi-dot").forEach((d, di) => d.classList.toggle("active", di === index));
-  }
-  document.getElementById("testiPrev").addEventListener("click", () => goTo(index - 1));
-  document.getElementById("testiNext").addEventListener("click", () => goTo(index + 1));
+function goToTesti(i) {
+  if (SITE_DATA.testimoni.length === 0) return;
+  testiIndex = (i + SITE_DATA.testimoni.length) % SITE_DATA.testimoni.length;
+  const track = document.getElementById("testiTrack");
+  if(track) track.style.transform = `translateX(-${testiIndex * 100}%)`;
+  document.querySelectorAll(".testi-dot").forEach((d, di) => d.classList.toggle("active", di === testiIndex));
+}
 
-  let auto = setInterval(() => goTo(index + 1), 6000);
-  track.closest(".testi-track-wrap").addEventListener("mouseenter", () => clearInterval(auto));
-  track.closest(".testi-track-wrap").addEventListener("mouseleave", () => (auto = setInterval(() => goTo(index + 1), 6000)));
+function initTesti() {
+  document.getElementById("testiPrev").addEventListener("click", () => goToTesti(testiIndex - 1));
+  document.getElementById("testiNext").addEventListener("click", () => goToTesti(testiIndex + 1));
+
+  const wrap = document.getElementById("testiTrack").closest(".testi-track-wrap");
+  testiAuto = setInterval(() => goToTesti(testiIndex + 1), 6000);
+  wrap.addEventListener("mouseenter", () => clearInterval(testiAuto));
+  wrap.addEventListener("mouseleave", () => (testiAuto = setInterval(() => goToTesti(testiIndex + 1), 6000)));
 }
 
 /* ============================================================
    9. FAQ accordion
    ============================================================ */
-function initFaq() {
+function renderFaq() {
   const wrap = document.getElementById("faqList");
+  wrap.innerHTML = "";
   SITE_DATA.faq.forEach(f => {
     const item = el(`
       <div class="faq-item">
         <button class="faq-q" aria-expanded="false">
-          <span>${f.q}</span><span class="plus"></span>
+          <span>${getLoc(f, 'q')}</span><span class="plus"></span>
         </button>
-        <div class="faq-a"><p>${f.a}</p></div>
+        <div class="faq-a"><p>${getLoc(f, 'a')}</p></div>
       </div>`);
+
     const btn = item.querySelector(".faq-q");
     const answer = item.querySelector(".faq-a");
     btn.addEventListener("click", () => {
       const isOpen = item.classList.contains("open");
-      document.querySelectorAll(".faq-item").forEach(i => { i.classList.remove("open"); i.querySelector(".faq-a").style.maxHeight = null; i.querySelector(".faq-q").setAttribute("aria-expanded", "false"); });
+      document.querySelectorAll(".faq-item").forEach(i => {
+        i.classList.remove("open");
+        i.querySelector(".faq-a").style.maxHeight = null;
+        i.querySelector(".faq-q").setAttribute("aria-expanded", "false");
+      });
       if (!isOpen) {
         item.classList.add("open");
         answer.style.maxHeight = answer.scrollHeight + "px";
@@ -320,11 +382,18 @@ function initFaq() {
 function renderContact() {
   const p = SITE_DATA.profil;
   const wrap = document.getElementById("contactInfo");
+  const labels = {
+    id: { addr: "Alamat", tel: "Telepon / WhatsApp", email: "Email", jam: "Jam Operasional" },
+    en: { addr: "Address", tel: "Phone / WhatsApp", email: "Email", jam: "Operating Hours" },
+    tr: { addr: "Adres", tel: "Telefon / WhatsApp", email: "E-posta", jam: "Çalışma Saatleri" }
+  };
+  const l = labels[currentLang];
+
   wrap.innerHTML = `
-    <div class="contact-row"><span class="ic"><i class="fa-solid fa-location-dot"></i></span><div><strong>Alamat</strong><span>${p.alamat}, ${p.kota}</span></div></div>
-    <div class="contact-row"><span class="ic"><i class="fa-solid fa-phone"></i></span><div><strong>Telepon / WhatsApp</strong><span><a href="tel:${p.telepon}">${p.telepon}</a></span></div></div>
-    <div class="contact-row"><span class="ic"><i class="fa-solid fa-envelope"></i></span><div><strong>Email</strong><span><a href="mailto:${p.email}">${p.email}</a></span></div></div>
-    <div class="contact-row"><span class="ic"><i class="fa-solid fa-clock"></i></span><div><strong>Jam Operasional</strong><span>${p.jamOperasional}</span></div></div>`;
+    <div class="contact-row"><span class="ic"><i class="fa-solid fa-location-dot"></i></span><div><strong>${l.addr}</strong><span>${p.alamat}, ${getLoc(p, 'kota')}</span></div></div>
+    <div class="contact-row"><span class="ic"><i class="fa-solid fa-phone"></i></span><div><strong>${l.tel}</strong><span><a href="tel:${p.telepon}">${p.telepon}</a></span></div></div>
+    <div class="contact-row"><span class="ic"><i class="fa-solid fa-envelope"></i></span><div><strong>${l.email}</strong><span><a href="mailto:${p.email}">${p.email}</a></span></div></div>
+    <div class="contact-row"><span class="ic"><i class="fa-solid fa-clock"></i></span><div><strong>${l.jam}</strong><span>${getLoc(p, 'jamOperasional')}</span></div></div>`;
 
   document.getElementById("socialRow").innerHTML = `
     <a href="${p.instagram}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -332,7 +401,7 @@ function renderContact() {
     <a href="${p.youtube}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
 
   document.getElementById("footerContact").innerHTML = `
-    <li>${p.alamat}</li>
+    <li>${p.alamat}, ${getLoc(p, 'kota')}</li>
     <li><a href="tel:${p.telepon}">${p.telepon}</a></li>
     <li><a href="mailto:${p.email}">${p.email}</a></li>`;
 }
@@ -398,9 +467,6 @@ function fileToBase64(file) {
 }
 
 async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec";
-
-  // PERBAIKAN: Tambahkan tanda seru (!) untuk mengecek jika URL kosong/belum diisi
   if (!APPS_SCRIPT_URL) {
     statusEl.textContent = "Backend belum terhubung. Lihat README.md untuk deploy Code.gs.";
     statusEl.className = "form-status err";
@@ -416,7 +482,6 @@ async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
-      // Penggunaan text/plain ini sudah SANGAT TEPAT untuk menghindari error CORS di Apps Script
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
@@ -478,11 +543,19 @@ function initForms() {
       nama: fd.get("nama"), whatsapp: fd.get("whatsapp"), program: fd.get("program"),
       nominal: fd.get("nominal"), metode: fd.get("metode"), catatan: fd.get("catatan")
     };
-    const ok = await kirimKeAppsScript(payload, statusEl, btnEl, `Konfirmasi donasi ${formatRupiah(payload.nominal)} diterima. Jazakumullahu khairan.`);
+    const msg = {
+      id: `Konfirmasi donasi ${formatRupiah(payload.nominal)} diterima. Jazakumullahu khairan.`,
+      en: `Donation confirmation of ${formatRupiah(payload.nominal)} received. May Allah reward you.`,
+      tr: `${formatRupiah(payload.nominal)} tutarındaki bağış onayı alındı. Allah razı olsun.`
+    }[currentLang];
+    const ok = await kirimKeAppsScript(payload, statusEl, btnEl, msg);
     if (ok) formD.reset();
   });
 }
 
+/* ============================================================
+   13. Multi-Bahasa / Translations
+   ============================================================ */
 const translations = {
   id: {
     navTentang: "Tentang",
@@ -505,12 +578,12 @@ const translations = {
     galeriTitle: "Galeri Kegiatan Pesantren",
     galeriSubtitle: "Dokumentasi keseharian, kegiatan belajar, dan acara-acara santri.",
     galeriEmpty: "Belum ada foto pada kategori ini.",
-    informasiTitle: "Informasi &amp; Berita Pesantren",
+    informasiTitle: "Informasi & Berita Pesantren",
     informasiSubtitle: "Pengumuman resmi, kegiatan terbaru, dan artikel seputar kehidupan pesantren.",
     pendaftaranTitle: "Pendaftaran Santri Baru",
     pendaftaranSubtitle: "Lengkapi formulir berikut. Data akan tercatat otomatis dan panitia akan menghubungi melalui WhatsApp.",
-    pendaftaranNote: "Pastikan nomor WhatsApp aktif agar panitia dapat menghubungi untuk proses selanjutnya. Ukuran pas foto maksimal 1&nbsp;MB.",
-    donasiTitle: "Donasi Kegiatan Pendidikan, Agama, Sosial &amp; Kemanusiaan",
+    pendaftaranNote: "Pastikan nomor WhatsApp aktif agar panitia dapat menghubungi untuk proses selanjutnya. Ukuran pas foto maksimal 1 MB.",
+    donasiTitle: "Donasi Kegiatan Pendidikan, Agama, Sosial & Kemanusiaan",
     donasiSubtitle: "Salurkan infaq dan sedekah Anda untuk mendukung pendidikan mahasantri dan kegiatan sosial kemasyarakatan.",
     donasiRekeningTitle: "Rekening Donasi Resmi",
     donasiScanQris: "Scan QRIS Donasi",
@@ -522,7 +595,7 @@ const translations = {
     donasiFormMetode: "Metode",
     donasiFormCatatan: "Catatan",
     donasiBtnKirim: "Kirim Konfirmasi Donasi",
-    testimoniTitle: "Kata Wali Santri &amp; Alumni",
+    testimoniTitle: "Kata Wali Santri & Alumni",
     faqTitle: "Pertanyaan yang Sering Diajukan",
     kontakTitle: "Hubungi Kami",
     footerDeskripsi: "Mencetak generasi yang menerapkan Al-Qur’an dan Sunnah Rasulullah SAW dalam kehidupan sehari-hari guna mendapatkan Ridha Ilahi.",
@@ -559,12 +632,12 @@ const translations = {
     galeriTitle: "Boarding School Activities Gallery",
     galeriSubtitle: "Documentation of daily life, learning activities, and student events.",
     galeriEmpty: "No photos in this category yet.",
-    informasiTitle: "Information &amp; News",
+    informasiTitle: "Information & News",
     informasiSubtitle: "Official announcements, latest activities, and articles about boarding school life.",
     pendaftaranTitle: "New Student Registration",
     pendaftaranSubtitle: "Complete the following form. Data will be recorded automatically and the committee will contact you via WhatsApp.",
-    pendaftaranNote: "Make sure the WhatsApp number is active so the committee can contact you for the next process. Maximum photo size 1&nbsp;MB.",
-    donasiTitle: "Donation for Educational, Religious, Social &amp; Humanitarian Activities",
+    pendaftaranNote: "Make sure the WhatsApp number is active so the committee can contact you for the next process. Maximum photo size 1 MB.",
+    donasiTitle: "Donation for Educational, Religious, Social & Humanitarian Activities",
     donasiSubtitle: "Channel your infaq and alms to support student education and community social activities.",
     donasiRekeningTitle: "Official Donation Account",
     donasiScanQris: "Scan QRIS Donation",
@@ -576,7 +649,7 @@ const translations = {
     donasiFormMetode: "Method",
     donasiFormCatatan: "Notes",
     donasiBtnKirim: "Send Donation Confirmation",
-    testimoniTitle: "Words from Parents &amp; Alumni",
+    testimoniTitle: "Words from Parents & Alumni",
     faqTitle: "Frequently Asked Questions",
     kontakTitle: "Contact Us",
     footerDeskripsi: "Molding a generation that applies the Qur'an and Sunnah of the Prophet SAW in daily life to gain Divine Pleasure.",
@@ -617,7 +690,7 @@ const translations = {
     informasiSubtitle: "Resmi duyurular, en son etkinlikler ve yurt hayatı hakkında makaleler.",
     pendaftaranTitle: "Yeni Talebe Kaydı",
     pendaftaranSubtitle: "Aşağıdaki formu doldurun. Veriler otomatik olarak kaydedilecek ve komite sizinle WhatsApp üzerinden iletişime geçecektir.",
-    pendaftaranNote: "Komitenin bir sonraki süreç için sizinle iletişime geçebilmesi için WhatsApp numarasının aktif olduğundan emin olun. Maksimum fotoğraf boyutu 1&nbsp;MB.",
+    pendaftaranNote: "Komitenin bir sonraki süreç için sizinle iletişime geçebilmesi için WhatsApp numarasının aktif olduğundan emin olun. Maksimum fotoğraf boyutu 1 MB.",
     donasiTitle: "Eğitim, Dini, Sosyal ve İnsani Faaliyetler İçin Bağış",
     donasiSubtitle: "Öğrenci eğitimini ve toplumsal sosyal faaliyetleri desteklemek için infak ve sadakalarınızı yönlendirin.",
     donasiRekeningTitle: "Resmi Bağış Hesabı",
@@ -649,6 +722,9 @@ const translations = {
 };
 
 function changeLanguage(lang) {
+  currentLang = lang;
+
+  // 1. Ubah teks statis melalui attribute data-i18n
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
     if (translations[lang] && translations[lang][key]) {
@@ -656,33 +732,43 @@ function changeLanguage(lang) {
     }
   });
   document.documentElement.lang = lang;
+
+  // 2. Render ulang semua data dinamis dari data.js
+  renderMeta();
+  renderStats();
+  renderAbout();
+  renderFasilitas();
+  renderGallery();
+  renderNews();
+  renderDonasi();
+  renderTesti();
+  renderFaq();
+  renderContact();
 }
 
 /* ============================================================
    INIT
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
-  renderMeta();
-  renderStats();
-  renderAbout();
-  renderFasilitas();
+  // Inisialisasi event listener yang hanya perlu dipanggil sekali (bukan konten)
   initGallery();
   initNews();
-  renderDonasi();
   initTesti();
-  initFaq();
-  renderContact();
   initNav();
   initReveal();
   initBackToTop();
-  initStatsAnimation();
   initForms();
 
+  // Setup Language Switcher & trigger render pertama kali
   const langSwitcher = document.getElementById('languageSwitcher');
   if (langSwitcher) {
     langSwitcher.addEventListener('change', (e) => {
       changeLanguage(e.target.value);
     });
+    // Render awal otomatis menggunakan bahasa default
     changeLanguage(langSwitcher.value);
   }
+
+  // Mulai Intersection Observer untuk animasi counter setelah konten siap
+  initStatsAnimation();
 });
