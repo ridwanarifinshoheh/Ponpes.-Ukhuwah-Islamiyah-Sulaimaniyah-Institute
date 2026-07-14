@@ -5,7 +5,7 @@
  *    Lihat README.md bagian "Menghubungkan Code.gs (backend)".
  */
 const APPS_SCRIPT_URL = "PASTE_URL_WEB_APP_APPS_SCRIPT_DI_SINI";
-
+let currentLang = 'id';
 /* ============================================================
    0. Util: gabungkan data dasar (data.js) dengan "lapisan admin"
    yang tersimpan di localStorage (ditulis oleh admin.html).
@@ -67,13 +67,18 @@ function renderMeta() {
    ============================================================ */
 function renderStats() {
   const wrap = document.getElementById("statsGrid");
+  wrap.innerHTML = ""; // Bersihkan kontainer sebelum merender ulang
   SITE_DATA.statistik.forEach(s => {
+    // Tentukan label mana yang dipakai berdasarkan currentLang
+    const label = currentLang === 'id' ? s.label : (currentLang === 'en' ? s.label_en : s.label_tr);
     wrap.appendChild(el(`
       <div class="stat">
         <strong data-count="${s.nilai}" data-suffix="${s.suffix}">0</strong>
-        <span>${s.label}</span>
+        <span>${label}</span>
       </div>`));
   });
+  // Jangan lupa panggil fungsi animasi setelah merender ulang
+  animateCounters();
 }
 function animateCounters() {
   document.querySelectorAll("[data-count]").forEach(node => {
@@ -95,14 +100,21 @@ function animateCounters() {
    3. Tentang
    ============================================================ */
 function renderAbout() {
-  document.getElementById("aboutSejarah").textContent = SITE_DATA.profil.sejarah;
-  document.getElementById("aboutSambutan").innerHTML =
-    `“${SITE_DATA.profil.sambutan}”<footer>— Syeikh Sulaiman Hilmi Tunahan qs. (Pendiri)</footer>`;
-  document.getElementById("aboutVisi").textContent = SITE_DATA.profil.visi;
+  // Ambil teks sesuai bahasa aktif
+  const p = SITE_DATA.profil;
+  const sejarah = currentLang === 'id' ? p.sejarah : (currentLang === 'en' ? p.sejarah_en : p.sejarah_tr);
+  const visi = currentLang === 'id' ? p.visi : (currentLang === 'en' ? p.visi_en : p.visi_tr);
+
+  document.getElementById("aboutSejarah").textContent = sejarah;
+  // (Lakukan hal yang sama untuk sambutan jika ada terjemahannya)
+
+  document.getElementById("aboutVisi").textContent = visi;
 
   const list = document.getElementById("aboutMisi");
-  SITE_DATA.profil.misi.forEach(m => {
-    list.appendChild(el(`<li><span class="ic"><i class="fa-solid fa-check"></i></span><span>${m}</span></li>`));
+  list.innerHTML = ""; // Bersihkan
+  p.misi.forEach(m => {
+    const teksMisi = currentLang === 'id' ? m.id : (currentLang === 'en' ? m.en : m.tr);
+    list.appendChild(el(`<li><span class="ic"><i class="fa-solid fa-check"></i></span><span>${teksMisi}</span></li>`));
   });
 }
 
