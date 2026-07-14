@@ -197,14 +197,17 @@ function saveOverlayCMS(jenis, itemObj) {
 }
 
 function renderTableCMS(jenis) {
-  const tbody = document.querySelector(`#tableCMS${jenis.charAt(0).toUpperCase() + jenis.slice(1)} tbody`);
+  function renderTableCMS(jenis) {
+  const tbody = document.getElementById(jenis === "galeri" ? "tbodyGaleri" : "tbodyBerita");
   if (!tbody) return;
-
-  const items = mergeDataCMS(jenis);
   tbody.innerHTML = "";
 
+  // Menggabungkan data bawaan dari data.js dengan data buatan admin di localStorage
+  const baseArray = jenis === "galeri" ? (SITE_DATA.galeri || []) : (SITE_DATA.berita || []);
+  const items = mergeWithOverlay(baseArray, jenis);
+
   if (items.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center">Tidak ada data.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding:20px;">Belum ada data.</td></tr>`;
     return;
   }
 
@@ -212,20 +215,25 @@ function renderTableCMS(jenis) {
     const tr = document.createElement("tr");
     const judul = item.judul || "Tanpa Judul";
 
+    // KODE BARU: Membuat elemen pratinjau gambar mini untuk tabel Admin
+    const imgPreview = item.img
+      ? `<img src="${item.img}" alt="Preview" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 12px; vertical-align: middle; flex-shrink: 0; border: 1px solid var(--emerald-soft);">`
+      : `<div style="width: 45px; height: 45px; border-radius: 6px; margin-right: 12px; background: var(--emerald-soft); display: flex; align-items: center; justify-content: center; color: var(--emerald); flex-shrink: 0;"><i class="fa-solid fa-image"></i></div>`;
+
     tr.innerHTML = `
       <td>${item.id}</td>
-      <td><strong>${judul}</strong></td>
+      <td>
+        <div style="display: flex; align-items: center;">
+          ${imgPreview}
+          <strong style="line-height: 1.3;">${judul}</strong>
+        </div>
+      </td>
       <td>${item.kategori || "-"}</td>
       <td>
         <button type="button" class="btn btn-outline btn-sm btn-delete" data-jenis="${jenis}" data-id="${item.id}">Hapus</button>
       </td>
     `;
     tbody.appendChild(tr);
-  });
-
-  // Delegasi event tombol hapus (menghindari inline onclick + masalah escaping id)
-  tbody.querySelectorAll(".btn-delete").forEach(btn => {
-    btn.addEventListener("click", () => deleteItem(btn.dataset.jenis, btn.dataset.id));
   });
 }
 
