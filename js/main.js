@@ -64,8 +64,11 @@ function renderMeta() {
   document.getElementById("fabWa").href = `https://wa.me/${wa}?text=${encodeURIComponent("Assalamu'alaikum, saya ingin bertanya seputar " + SITE_DATA.profil.nama)}`;
 
   // Perbaikan sintaksis literal string untuk query parameter Google Maps
-  document.getElementById("mapFrame").querySelector("iframe").src =
-    `https://maps.google.com/maps?q=${encodeURIComponent(SITE_DATA.profil.mapsEmbedQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+  const mapFrame = document.getElementById("mapFrame");
+  if(mapFrame) {
+      const iframe = mapFrame.querySelector("iframe");
+      if(iframe) iframe.src = `https://maps.google.com/maps?q=${encodeURIComponent(SITE_DATA.profil.mapsEmbedQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+  }
 }
 
 /* ============================================================
@@ -73,6 +76,7 @@ function renderMeta() {
    ============================================================ */
 function renderStats() {
   const wrap = document.getElementById("statsGrid");
+  if (!wrap) return;
   wrap.innerHTML = "";
   SITE_DATA.statistik.forEach(s => {
     const label = getLoc(s, 'label');
@@ -105,21 +109,30 @@ function animateCounters() {
    ============================================================ */
 function renderAbout() {
   const p = SITE_DATA.profil;
-  document.getElementById("aboutSejarah").textContent = getLoc(p, 'sejarah');
-  document.getElementById("aboutVisi").textContent = getLoc(p, 'visi');
+
+  const aboutSejarah = document.getElementById("aboutSejarah");
+  if(aboutSejarah) aboutSejarah.textContent = getLoc(p, 'sejarah');
+
+  const aboutVisi = document.getElementById("aboutVisi");
+  if(aboutVisi) aboutVisi.textContent = getLoc(p, 'visi');
 
   const labelPendiri = { id: "Pendiri", en: "Founder", tr: "Kurucu" }[currentLang];
-  document.getElementById("aboutSambutan").innerHTML = `
-    "${getLoc(p, 'sambutan')}"
-    <footer>— Syeikh Sulaiman Hilmi Tunahan Q.S || ${labelPendiri}</footer>
-  `;
+  const aboutSambutan = document.getElementById("aboutSambutan");
+  if(aboutSambutan) {
+      aboutSambutan.innerHTML = `
+        "${getLoc(p, 'sambutan')}"
+        <footer>— Syeikh Sulaiman Hilmi Tunahan Q.S || ${labelPendiri}</footer>
+      `;
+  }
 
   const list = document.getElementById("aboutMisi");
-  list.innerHTML = "";
-  p.misi.forEach(m => {
-    const teksMisi = m[currentLang] || m.id;
-    list.appendChild(el(`<li><span class="ic"><i class="fa-solid fa-check"></i></span><span>${teksMisi}</span></li>`));
-  });
+  if(list) {
+      list.innerHTML = "";
+      p.misi.forEach(m => {
+        const teksMisi = m[currentLang] || m.id;
+        list.appendChild(el(`<li><span class="ic"><i class="fa-solid fa-check"></i></span><span>${teksMisi}</span></li>`));
+      });
+  }
 }
 
 /* ============================================================
@@ -127,6 +140,7 @@ function renderAbout() {
    ============================================================ */
 function renderFasilitas() {
   const wrap = document.getElementById("facilityGrid");
+  if (!wrap) return;
   wrap.innerHTML = "";
   SITE_DATA.fasilitas.forEach(f => {
     wrap.appendChild(el(`
@@ -152,6 +166,7 @@ let currentGalleryFilter = "semua";
 function renderGalleryFilters() {
   const cats = ["semua", ...new Set(galleryData.map(g => g.kategori))];
   const wrap = document.getElementById("galleryFilters");
+  if(!wrap) return;
   wrap.innerHTML = "";
   cats.forEach((c) => {
     const label = GALLERY_LABELS[currentLang][c] || GALLERY_LABELS['id'][c] || c;
@@ -169,9 +184,11 @@ function renderGalleryFilters() {
 function renderGalleryGrid(filter) {
   const grid = document.getElementById("galleryGrid");
   const empty = document.getElementById("galleryEmpty");
+  if (!grid) return;
+
   grid.innerHTML = "";
   const items = filter === "semua" ? galleryData : galleryData.filter(g => g.kategori === filter);
-  empty.hidden = items.length > 0;
+  if(empty) empty.hidden = items.length > 0;
 
   items.forEach(g => {
     const judul = getLoc(g, 'judul');
@@ -203,16 +220,19 @@ function renderGallery() {
 }
 
 function initGallery() {
-  document.getElementById("lightboxClose").addEventListener("click", () => document.getElementById("lightbox").classList.remove("open"));
-  document.getElementById("lightbox").addEventListener("click", e => { if (e.target.id === "lightbox") e.currentTarget.classList.remove("open"); });
+  const btnClose = document.getElementById("lightboxClose");
+  const lbox = document.getElementById("lightbox");
+  if (btnClose) btnClose.addEventListener("click", () => lbox.classList.remove("open"));
+  if (lbox) lbox.addEventListener("click", e => { if (e.target.id === "lightbox") e.currentTarget.classList.remove("open"); });
 }
 
 /* ============================================================
-   6. Berita / Informasi
+   6. Berita / Informasi (DENGAN DUKUNGAN GAMBAR/FOTO)
    ============================================================ */
 function renderNews() {
   const items = mergeWithOverlay(SITE_DATA.berita, "berita").sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
   const grid = document.getElementById("newsGrid");
+  if (!grid) return;
   grid.innerHTML = "";
   const moreLabel = { id: "Baca selengkapnya", en: "Read more", tr: "Devamını oku" }[currentLang];
 
@@ -221,9 +241,16 @@ function renderNews() {
     const ringkasan = getLoc(n, 'ringkasan');
     const isi = getLoc(n, 'isi');
 
+    // Cek apakah item berita memiliki gambar
+    const imgHtml = n.img
+      ? `<img src="${n.img}" alt="${judul}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">`
+      : `<i class="fa-solid ${NEWS_ICONS[n.kategori] || "fa-newspaper"}"></i>`;
+
     const card = el(`
       <article class="news-card" role="button" tabindex="0">
-        <div class="news-thumb"><i class="fa-solid ${NEWS_ICONS[n.kategori] || "fa-newspaper"}"></i></div>
+        <div class="news-thumb">
+          ${imgHtml}
+        </div>
         <div class="news-body">
           <div class="news-meta"><span>${n.kategori}</span><span>·</span><span>${formatTanggal(n.tanggal)}</span></div>
           <h3>${judul}</h3>
@@ -235,7 +262,18 @@ function renderNews() {
     const openModal = () => {
       document.getElementById("newsModalMeta").textContent = `${n.kategori} · ${formatTanggal(n.tanggal)}`;
       document.getElementById("newsModalTitle").textContent = judul;
-      document.getElementById("newsModalBody").textContent = isi;
+
+      const modalBody = document.getElementById("newsModalBody");
+      modalBody.innerHTML = ""; // Bersihkan konten modal sebelumnya
+
+      // Sisipkan gambar ke dalam modal jika tersedia
+      if (n.img) {
+          modalBody.innerHTML += `<img src="${n.img}" alt="${judul}" style="width: 100%; border-radius: 8px; margin-bottom: 16px; object-fit: cover; max-height: 350px;">`;
+      }
+
+      // Sisipkan teks berita
+      modalBody.innerHTML += `<p style="color:#4a615a;font-size:.94rem;line-height:1.7">${isi}</p>`;
+
       document.getElementById("newsModal").classList.add("open");
     };
 
@@ -246,8 +284,10 @@ function renderNews() {
 }
 
 function initNews() {
-  document.getElementById("newsModalClose").addEventListener("click", () => document.getElementById("newsModal").classList.remove("open"));
-  document.getElementById("newsModal").addEventListener("click", e => { if (e.target.id === "newsModal") e.currentTarget.classList.remove("open"); });
+  const btnClose = document.getElementById("newsModalClose");
+  const modal = document.getElementById("newsModal");
+  if(btnClose) btnClose.addEventListener("click", () => modal.classList.remove("open"));
+  if(modal) modal.addEventListener("click", e => { if (e.target.id === "newsModal") e.currentTarget.classList.remove("open"); });
 }
 
 /* ============================================================
@@ -255,46 +295,54 @@ function initNews() {
    ============================================================ */
 function renderDonasi() {
   const wrap = document.getElementById("donationPrograms");
-  wrap.innerHTML = "";
+  if(wrap) {
+      wrap.innerHTML = "";
+      SITE_DATA.donasiProgram.forEach(p => {
+        const judul = getLoc(p, 'judul');
+        wrap.appendChild(el(`
+          <div class="dprogram">
+            <div class="ic"><i class="fa-solid ${ICONS[p.icon] || "fa-hand-holding-heart"}"></i></div>
+            <h3>${judul}</h3>
+            <p>${getLoc(p, 'deskripsi')}</p>
+          </div>`));
+      });
+  }
 
   const select = document.getElementById("d_program");
-  const optDefault = { id: "Pilih program", en: "Select program", tr: "Program seçin" }[currentLang];
-  select.innerHTML = `<option value="">${optDefault}</option>`;
-
-  SITE_DATA.donasiProgram.forEach(p => {
-    const judul = getLoc(p, 'judul');
-    wrap.appendChild(el(`
-      <div class="dprogram">
-        <div class="ic"><i class="fa-solid ${ICONS[p.icon] || "fa-hand-holding-heart"}"></i></div>
-        <h3>${judul}</h3>
-        <p>${getLoc(p, 'deskripsi')}</p>
-      </div>`));
-    select.appendChild(el(`<option value="${judul}">${judul}</option>`));
-  });
+  if(select) {
+      const optDefault = { id: "Pilih program", en: "Select program", tr: "Program seçin" }[currentLang];
+      select.innerHTML = `<option value="">${optDefault}</option>`;
+      SITE_DATA.donasiProgram.forEach(p => {
+        const judul = getLoc(p, 'judul');
+        select.appendChild(el(`<option value="${judul}">${judul}</option>`));
+      });
+  }
 
   const bankList = document.getElementById("bankList");
-  bankList.innerHTML = "";
-  const copyText = { id: "Salin", en: "Copy", tr: "Kopyala" }[currentLang];
-  const copiedText = { id: "Tersalin!", en: "Copied!", tr: "Kopyalandı!" }[currentLang];
+  if(bankList) {
+      bankList.innerHTML = "";
+      const copyText = { id: "Salin", en: "Copy", tr: "Kopyala" }[currentLang];
+      const copiedText = { id: "Tersalin!", en: "Copied!", tr: "Kopyalandı!" }[currentLang];
 
-  SITE_DATA.rekening.forEach(r => {
-    const row = el(`
-      <div class="bank-row">
-        <div>
-          <strong>${r.nomor}</strong>
-          <span>${r.bank} — a.n. ${r.atasNama}</span>
-        </div>
-        <button type="button" class="copy-btn">${copyText}</button>
-      </div>`);
+      SITE_DATA.rekening.forEach(r => {
+        const row = el(`
+          <div class="bank-row">
+            <div>
+              <strong>${r.nomor}</strong>
+              <span>${r.bank} — a.n. ${r.atasNama}</span>
+            </div>
+            <button type="button" class="copy-btn">${copyText}</button>
+          </div>`);
 
-    row.querySelector(".copy-btn").addEventListener("click", (e) => {
-      navigator.clipboard.writeText(r.nomor).then(() => {
-        e.target.textContent = copiedText;
-        setTimeout(() => (e.target.textContent = copyText), 1500);
+        row.querySelector(".copy-btn").addEventListener("click", (e) => {
+          navigator.clipboard.writeText(r.nomor).then(() => {
+            e.target.textContent = copiedText;
+            setTimeout(() => (e.target.textContent = copyText), 1500);
+          });
+        });
+        bankList.appendChild(row);
       });
-    });
-    bankList.appendChild(row);
-  });
+  }
 }
 
 /* ============================================================
@@ -306,6 +354,8 @@ let testiAuto;
 function renderTesti() {
   const track = document.getElementById("testiTrack");
   const dots = document.getElementById("testiDots");
+  if (!track || !dots) return;
+
   track.innerHTML = "";
   dots.innerHTML = "";
 
@@ -334,13 +384,21 @@ function goToTesti(i) {
 }
 
 function initTesti() {
-  document.getElementById("testiPrev").addEventListener("click", () => goToTesti(testiIndex - 1));
-  document.getElementById("testiNext").addEventListener("click", () => goToTesti(testiIndex + 1));
+  const prev = document.getElementById("testiPrev");
+  const next = document.getElementById("testiNext");
+  const track = document.getElementById("testiTrack");
 
-  const wrap = document.getElementById("testiTrack").closest(".testi-track-wrap");
-  testiAuto = setInterval(() => goToTesti(testiIndex + 1), 6000);
-  wrap.addEventListener("mouseenter", () => clearInterval(testiAuto));
-  wrap.addEventListener("mouseleave", () => (testiAuto = setInterval(() => goToTesti(testiIndex + 1), 6000)));
+  if(prev) prev.addEventListener("click", () => goToTesti(testiIndex - 1));
+  if(next) next.addEventListener("click", () => goToTesti(testiIndex + 1));
+
+  if(track) {
+      const wrap = track.closest(".testi-track-wrap");
+      if(wrap) {
+          testiAuto = setInterval(() => goToTesti(testiIndex + 1), 6000);
+          wrap.addEventListener("mouseenter", () => clearInterval(testiAuto));
+          wrap.addEventListener("mouseleave", () => (testiAuto = setInterval(() => goToTesti(testiIndex + 1), 6000)));
+      }
+  }
 }
 
 /* ============================================================
@@ -348,6 +406,7 @@ function initTesti() {
    ============================================================ */
 function renderFaq() {
   const wrap = document.getElementById("faqList");
+  if (!wrap) return;
   wrap.innerHTML = "";
   SITE_DATA.faq.forEach(f => {
     const item = el(`
@@ -383,6 +442,8 @@ function renderFaq() {
 function renderContact() {
   const p = SITE_DATA.profil;
   const wrap = document.getElementById("contactInfo");
+  if(!wrap) return;
+
   const labels = {
     id: { addr: "Alamat", tel: "Telepon / WhatsApp", email: "Email", jam: "Jam Operasional" },
     en: { addr: "Address", tel: "Phone / WhatsApp", email: "Email", jam: "Operating Hours" },
@@ -396,15 +457,21 @@ function renderContact() {
     <div class="contact-row"><span class="ic"><i class="fa-solid fa-envelope"></i></span><div><strong>${l.email}</strong><span><a href="mailto:${p.email}">${p.email}</a></span></div></div>
     <div class="contact-row"><span class="ic"><i class="fa-solid fa-clock"></i></span><div><strong>${l.jam}</strong><span>${getLoc(p, 'jamOperasional')}</span></div></div>`;
 
-  document.getElementById("socialRow").innerHTML = `
-    <a href="${p.instagram}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-    <a href="${p.facebook}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-    <a href="${p.youtube}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
+  const socialRow = document.getElementById("socialRow");
+  if(socialRow) {
+      socialRow.innerHTML = `
+        <a href="${p.instagram}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="${p.facebook}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="${p.youtube}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>`;
+  }
 
-  document.getElementById("footerContact").innerHTML = `
-    <li>${p.alamat}, ${getLoc(p, 'kota')}</li>
-    <li><a href="tel:${p.telepon}">${p.telepon}</a></li>
-    <li><a href="mailto:${p.email}">${p.email}</a></li>`;
+  const footerContact = document.getElementById("footerContact");
+  if(footerContact) {
+      footerContact.innerHTML = `
+        <li>${p.alamat}, ${getLoc(p, 'kota')}</li>
+        <li><a href="tel:${p.telepon}">${p.telepon}</a></li>
+        <li><a href="mailto:${p.email}">${p.email}</a></li>`;
+  }
 }
 
 /* ============================================================
@@ -412,19 +479,21 @@ function renderContact() {
    ============================================================ */
 function initNav() {
   const toggle = document.getElementById("navToggle");
-  const links = document.getElementById("navLinks");
-  toggle.addEventListener("click", () => {
-    const open = links.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", open);
-    toggle.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-  });
-  links.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
-    links.classList.remove("open");
-    toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
-  }));
+  const links = document.getElementById("navLinks") || document.getElementById("mainNav");
+  if(toggle && links) {
+      toggle.addEventListener("click", () => {
+        const open = links.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", open);
+        toggle.innerHTML = open ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+      });
+      links.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+        links.classList.remove("open");
+        toggle.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      }));
+  }
 
   const sections = [...document.querySelectorAll("main section[id]")];
-  const navA = [...links.querySelectorAll("a")];
+  const navA = links ? [...links.querySelectorAll("a")] : [];
   const obs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -443,30 +512,24 @@ function initReveal() {
 }
 function initBackToTop() {
   const btn = document.getElementById("backToTop");
-  window.addEventListener("scroll", () => btn.classList.toggle("show", window.scrollY > 500));
-  btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  if(btn) {
+      window.addEventListener("scroll", () => btn.classList.toggle("show", window.scrollY > 500));
+      btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
 }
 function initStatsAnimation() {
   const target = document.getElementById("statsGrid");
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(entry => { if (entry.isIntersecting) { animateCounters(); obs.disconnect(); } });
-  }, { threshold: 0.4 });
-  obs.observe(target);
+  if(target) {
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (entry.isIntersecting) { animateCounters(); obs.disconnect(); } });
+      }, { threshold: 0.4 });
+      obs.observe(target);
+  }
 }
 
 /* ============================================================
    12. Kirim form ke Apps Script (Google Sheets)
    ============================================================ */
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
   if (!APPS_SCRIPT_URL) {
     statusEl.textContent = "Backend belum terhubung. Lihat README.md untuk deploy Code.gs.";
@@ -507,29 +570,49 @@ async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
 
 function initForms() {
   const formD = document.getElementById("formDonasi");
-  formD.addEventListener("submit", async e => {
-    e.preventDefault();
-    const statusEl = document.getElementById("donasiStatus");
-    const btnEl = document.getElementById("donasiSubmit");
-    const fd = new FormData(formD);
+  if(formD) {
+      formD.addEventListener("submit", async e => {
+        e.preventDefault();
+        const statusEl = document.getElementById("donasiStatus");
+        const btnEl = document.getElementById("donasiSubmit") || document.getElementById("btnSubmitDonasi");
+        const fd = new FormData(formD);
 
-    // Sinkronisasi: Mendukung atribut nama 'program' maupun 'd_program'
-    const programValue = fd.get("program") || fd.get("d_program");
+        // Sinkronisasi: Mendukung atribut nama 'program' maupun 'd_program'
+        const programValue = fd.get("program") || fd.get("d_program") || document.getElementById("d_program")?.value;
+        const metodeValue = fd.get("metode") || document.getElementById("d_metode")?.value;
+        const namaValue = fd.get("nama") || document.getElementById("d_nama")?.value;
+        const waValue = fd.get("whatsapp") || document.getElementById("d_wa")?.value;
+        const nominalValue = fd.get("nominal") || document.getElementById("d_nominal")?.value;
+        const catatanValue = fd.get("catatan") || document.getElementById("d_pesan")?.value || fd.get("pesan") || "";
 
-    const payload = {
-      jenis: "donasi",
-      waktu: new Date().toISOString(),
-      nama: fd.get("nama"), whatsapp: fd.get("whatsapp"), program: programValue,
-      nominal: fd.get("nominal"), metode: fd.get("metode"), catatan: fd.get("catatan")
-    };
-    const msg = {
-      id: `Konfirmasi donasi ${formatRupiah(payload.nominal)} diterima. Jazakumullahu khairan.`,
-      en: `Donation confirmation of ${formatRupiah(payload.nominal)} received. May Allah reward you.`,
-      tr: `${formatRupiah(payload.nominal)} tutarındaki bağış onayı alındı. Allah razı olsun.`
-    }[currentLang];
-    const ok = await kirimKeAppsScript(payload, statusEl, btnEl, msg);
-    if (ok) formD.reset();
-  });
+        const payload = {
+          jenis: "donasi",
+          waktu: new Date().toISOString(),
+          nama: namaValue, whatsapp: waValue, program: programValue,
+          nominal: nominalValue, metode: metodeValue, catatan: catatanValue
+        };
+        const msg = {
+          id: `Konfirmasi donasi ${formatRupiah(payload.nominal)} diterima. Jazakumullahu khairan.`,
+          en: `Donation confirmation of ${formatRupiah(payload.nominal)} received. May Allah reward you.`,
+          tr: `${formatRupiah(payload.nominal)} tutarındaki bağış onayı alındı. Allah razı olsun.`
+        }[currentLang];
+
+        if (statusEl) {
+            const ok = await kirimKeAppsScript(payload, statusEl, btnEl, msg);
+            if (ok) formD.reset();
+        } else {
+            // Fallback apabila tidak ada elemen statusEl
+            const tempStatus = document.createElement("span");
+            const ok = await kirimKeAppsScript(payload, tempStatus, btnEl, msg);
+            if (ok) {
+                alert(msg);
+                formD.reset();
+            } else {
+                alert("Terjadi kendala mengirim data.");
+            }
+        }
+      });
+  }
 }
 
 /* ============================================================
@@ -746,6 +829,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     // Render awal otomatis menggunakan bahasa default
     changeLanguage(langSwitcher.value);
+  } else {
+    // Jalankan normal jika switcher tidak tersedia di HTML
+    changeLanguage(currentLang);
   }
 
   // Mulai Intersection Observer untuk animasi counter setelah konten siap
