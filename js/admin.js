@@ -178,6 +178,11 @@ function deleteItem(jenis, id) {
     localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(overlay));
   }
 
+  // Jika item yang sedang diedit ternyata dihapus, batalkan mode edit supaya form tidak submit ke id yang sudah hilang
+  if (editState[jenis] === id) {
+    cancelEdit(jenis);
+  }
+
   renderTableCMS(jenis);
   showToast("Data dihapus. Perubahan akan terlihat di halaman utama pengunjung (browser ini).");
 }
@@ -225,38 +230,91 @@ function renderTableCMS(jenis) {
       </td>
       <td>${item.kategori || "-"}</td>
       <td>
-        <button type="button" class="btn btn-outline btn-sm btn-delete" data-jenis="${jenis}" data-id="${item.id}">Hapus</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-outline btn-sm btn-edit" data-jenis="${jenis}" data-id="${item.id}">Edit</button>
+          <button type="button" class="btn btn-outline btn-sm btn-delete" data-jenis="${jenis}" data-id="${item.id}">Hapus</button>
+        </div>
       </td>
     `;
     tbody.appendChild(tr);
   });
 
-  // Delegasi event tombol hapus (dipasang ulang tiap render karena tbody di-innerHTML)
+  // Delegasi event tombol edit & hapus (dipasang ulang tiap render karena tbody di-innerHTML)
+  tbody.querySelectorAll(".btn-edit").forEach(btn => {
+    btn.addEventListener("click", () => prepareEdit(btn.dataset.jenis, btn.dataset.id));
+  });
   tbody.querySelectorAll(".btn-delete").forEach(btn => {
     btn.addEventListener("click", () => deleteItem(btn.dataset.jenis, btn.dataset.id));
   });
 }
 
 /* ============================================================
-   5. Form Handler untuk Tambah Data CMS
+   4b. Mode Edit untuk CMS (Berita & Galeri)
+   Mengisi ulang form dengan data item yang dipilih, lalu form
+   handler di bagian 5 otomatis melakukan UPDATE (bukan tambah baru)
+   selama editState[jenis] masih terisi id item tsb.
+   ============================================================ */
+// Menyimpan id item yang sedang diedit per jenis (null = mode tambah baru)
+const editState = { berita: null, galeri: null };
+
+function prepareEdit(jenis, id) {
+  const item = mergeDataCMS(jenis).find(it => it.id === id);
+  if (!item) return;
+
+  if (jenis === "berita") {
+    editState.berita = id;
+    document.getElementById("b_judul").value = item.judul || "";
+    document.getElementById("b_kategori").value = item.kategori || "";
+    document.getElementById("b_img_url").value = item.img || "";
+    document.getElementById("b_ringkasan").value = item.ringkasan || "";
+    document.getElementById("b_isi").innerHTML = item.isi || "";
+    document.getElementById("btnSubmitBerita").textContent = "Update Berita";
+    document.getElementById("formTambahBerita").scrollIntoView({ behavior: "smooth", block: "start" });
+  } else if (jenis === "galeri") {
+    editState.galeri = id;
+    document.getElementById("g_judul").value = item.judul || "";
+    document.getElementById("g_kategori").value = item.kategori || "";
+    document.getElementById("g_img_url").value = item.img || "";
+    const btn = document.getElementById("btnSubmitGaleri");
+    if (btn) btn.textContent = "Update Foto";
+    document.getElementById("formTambahGaleri").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function cancelEdit(jenis) {
+  editState[jenis] = null;
+  if (jenis === "berita") {
+    document.getElementById("btnSubmitBerita").textContent = "Tambah Berita";
+  } else if (jenis === "galeri") {
+    const btn = document.getElementById("btnSubmitGaleri");
+    if (btn) btn.textContent = "Tambah Foto";
+  }
+}
+
+/* ============================================================
+   5. Form Handler untuk Tambah/Update Data CMS
    ============================================================ */
 function initCMSForms() {
   const formBerita = document.getElementById("formTambahBerita");
   if (formBerita) {
     formBerita.addEventListener("submit", (e) => {
       e.preventDefault();
-      const id = "b_" + Date.now();
+      const idLama = editState.berita;
+      const existing = idLama ? mergeDataCMS("berita").find(it => it.id === idLama) : null;
+
       const newItem = {
-        id: id,
+        id: idLama || ("b_" + Date.now()),
         kategori: document.getElementById("b_kategori").value,
-        tanggal: new Date().toISOString().split("T")[0],
+        tanggal: existing ? existing.tanggal : new Date().toISOString().split("T")[0],
         judul: document.getElementById("b_judul").value,
         ringkasan: document.getElementById("b_ringkasan").value,
-        isi: document.getElementById("b_isi").value,
+        isi: document.getElementById("b_isi").innerHTML, // b_isi adalah div contenteditable, bukan textarea, jadi diambil lewat innerHTML
         img: document.getElementById("b_img_url").value
       };
       saveOverlayCMS("berita", newItem);
       formBerita.reset();
+      document.getElementById("b_isi").innerHTML = ""; // reset() bawaan form tidak membersihkan div contenteditable
+      cancelEdit("berita");
     });
   }
 
@@ -264,15 +322,16 @@ function initCMSForms() {
   if (formGaleri) {
     formGaleri.addEventListener("submit", (e) => {
       e.preventDefault();
-      const id = "g_" + Date.now();
+      const idLama = editState.galeri;
       const newItem = {
-        id: id,
+        id: idLama || ("g_" + Date.now()),
         kategori: document.getElementById("g_kategori").value,
         judul: document.getElementById("g_judul").value,
         img: document.getElementById("g_img_url").value
       };
       saveOverlayCMS("galeri", newItem);
       formGaleri.reset();
+      cancelEdit("galeri");
     });
   }
 }
@@ -307,7 +366,6 @@ function showToast(message) {
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 3000);
 }
-
 /* ============================================================
    INIT
    ============================================================ */

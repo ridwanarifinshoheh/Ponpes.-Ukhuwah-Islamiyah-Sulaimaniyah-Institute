@@ -83,7 +83,7 @@
         </div>
         <div class="field">
           <label for="g_img_url">URL Gambar <span class="req">*</span></label>
-          <input id="g_img_url" placeholder="https://... atau assets/images/nama.jpg" required>
+          <input id="g_img_url" placeholder="https://... atau assets/images/nama.jpg/png" required>
         </div>
       </div>
       <div class="form-foot">
@@ -111,66 +111,67 @@
     </div>
   </section>
 
-  <section class="admin-panel tab-pane" id="panel-berita">
-    <h3 style="margin-bottom:18px">Tambah / Edit Berita</h3>
-    <form id="formTambahBerita">
-      <div class="form-grid">
-        <div class="field full">
-          <label for="b_judul">Judul <span class="req">*</span></label>
-          <input id="b_judul" required>
-        </div>
-        <div class="field">
-          <label for="b_kategori">Kategori <span class="req">*</span></label>
-          <select id="b_kategori" required>
-            <option value="pengumuman">Pengumuman</option>
-            <option value="kegiatan">Kegiatan</option>
-            <option value="artikel">Artikel</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="b_img_url">URL Gambar / Foto <span class="req">*</span></label>
-          <input id="b_img_url" placeholder="https://... atau assets/images/nama.jpg" required>
-        </div>
-        <div class="field full">
-          <label for="b_ringkasan">Ringkasan Singkat <span class="req">*</span></label>
-          <textarea id="b_ringkasan" rows="2" required></textarea>
-        </div>
-        <div class="field full">
-          <label for="b_isi">Isi Lengkap <span class="req">*</span></label>
-          <textarea id="b_isi" rows="5" required></textarea>
-        </div>
+<section class="admin-panel tab-pane" id="panel-berita">
+  <h3 style="margin-bottom:18px">Tambah / Edit Berita</h3>
+  <form id="formTambahBerita">
+    <div class="form-grid">
+      <div class="field full">
+        <label for="b_judul">Judul <span class="req">*</span></label>
+        <input id="b_judul" required>
       </div>
-      <div class="form-foot">
-        <button type="submit" class="btn btn-primary">Tambah Berita</button>
+      <div class="field">
+        <label for="b_kategori">Kategori <span class="req">*</span></label>
+        <select id="b_kategori" required>
+          <option value="pengumuman">Pengumuman</option>
+          <option value="kegiatan">Kegiatan</option>
+          <option value="artikel">Artikel</option>
+        </select>
       </div>
-    </form>
+      <div class="field">
+        <label for="g_img_url">URL Gambar <span class="req">*</span></label>
+        <input id="g_img_url" placeholder="https://... atau assets/images/nama.jpg/png" required>
+      </div>
+      <div class="field full">
+        <label for="b_ringkasan">Ringkasan Singkat <span class="req">*</span></label>
+        <textarea id="b_ringkasan" rows="2" required></textarea>
+      </div>
 
-    <div style="margin-top: 30px;">
-      <h4 style="margin-bottom: 12px;">Daftar Konten Berita</h4>
-      <div style="overflow-x: auto;">
-        <table id="tableCMSBerita" class="admin-table" style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
-              <th style="padding: 12px 10px;">ID</th>
-              <th style="padding: 12px 10px;">Judul</th>
-              <th style="padding: 12px 10px;">Kategori</th>
-              <th style="padding: 12px 10px;">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="4" class="text-center" style="padding: 20px;">Memuat berita...</td></tr>
-          </tbody>
-        </table>
+      <!-- REVISI: Mengganti textarea b_isi dengan Editor -->
+      <div class="field full">
+        <label>Isi Lengkap <span class="req">*</span></label>
+        <div class="editor-toolbar" style="margin-bottom: 5px;">
+          <button type="button" class="btn-sm" onclick="document.execCommand('bold', false, null)"><b>B</b></button>
+          <button type="button" class="btn-sm" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
+          <button type="button" class="btn-sm" onclick="document.execCommand('underline', false, null)"><u>U</u></button>
+        </div>
+        <div id="b_isi" contenteditable="true" style="min-height: 150px; border: 1px solid #ccc; padding: 10px; border-radius: 4px; background: #fff;"></div>
       </div>
     </div>
-  </section>
+    <div class="form-foot">
+      <button type="submit" id="btnSubmitBerita" class="btn btn-primary">Tambah Berita</button>
+    </div>
+  </form>
+
+  <!-- Tabel daftar berita -->
+  <div style="margin-top: 30px;">
+    <h4 style="margin-bottom: 12px;">Daftar Konten Berita</h4>
+    <div style="overflow-x: auto;">
+      <table id="tableCMSBerita" class="admin-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+            <th style="padding: 12px 10px;">ID</th>
+            <th style="padding: 12px 10px;">Judul</th>
+            <th style="padding: 12px 10px;">Kategori</th>
+            <th style="padding: 12px 10px;">Aksi</th> <!-- Kolom Aksi -->
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
   <section class="admin-panel tab-pane" id="panel-formulir">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
-      <h3 style="margin: 0;">Data Formulir Pesantren</h3>
-      <span id="dashboardStatus" style="font-weight: 600; color: var(--emerald); font-size: 0.95rem;"></span>
-    </div>
-
     <div>
       <h4 style="margin-bottom: 12px;">Daftar Konfirmasi Donasi (Google Sheets)</h4>
       <div style="overflow-x: auto;">
