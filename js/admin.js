@@ -7,7 +7,7 @@
  * gunakan panel ini untuk menyimpan data yang benar-benar rahasia.
  * Ganti nilai di bawah dengan kata sandimu sendiri sebelum di-push ke GitHub.
  */
-const APPS_SCRIPT_URL = "PASTE_URL_WEB_APP_APPS_SCRIPT_DI_SINI";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxG12wdncK7D5MY8zZkXY2BHVXQ3lYC57m7Rv4l1hUR/dev";
 /* ============================================================
    Storage overlay — kontrak SAMA PERSIS dengan js/main.js
    ============================================================ */

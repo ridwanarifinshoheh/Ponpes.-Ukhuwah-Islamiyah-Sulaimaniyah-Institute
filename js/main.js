@@ -4,7 +4,7 @@
  * 1. TEMPEL URL WEB APP APPS SCRIPT KAMU DI BAWAH INI setelah deploy Code.gs.
  * Lihat README.md bagian "Menghubungkan Code.gs (backend)".
  */
-const APPS_SCRIPT_URL = "PASTE_URL_WEB_APP_APPS_SCRIPT_DI_SINI";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec";
 let currentLang = 'id';
 
 /* ============================================================
@@ -63,6 +63,7 @@ function renderMeta() {
   const wa = SITE_DATA.profil.whatsapp;
   document.getElementById("fabWa").href = `https://wa.me/${wa}?text=${encodeURIComponent("Assalamu'alaikum, saya ingin bertanya seputar " + SITE_DATA.profil.nama)}`;
 
+  // Perbaikan sintaksis literal string untuk query parameter Google Maps
   document.getElementById("mapFrame").querySelector("iframe").src =
     `https://maps.google.com/maps?q=${encodeURIComponent(SITE_DATA.profil.mapsEmbedQuery)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 }
@@ -537,10 +538,14 @@ function initForms() {
     const statusEl = document.getElementById("donasiStatus");
     const btnEl = document.getElementById("donasiSubmit");
     const fd = new FormData(formD);
+
+    // Sinkronisasi: Mendukung atribut nama 'program' maupun 'd_program'
+    const programValue = fd.get("program") || fd.get("d_program");
+
     const payload = {
       jenis: "donasi",
       waktu: new Date().toISOString(),
-      nama: fd.get("nama"), whatsapp: fd.get("whatsapp"), program: fd.get("program"),
+      nama: fd.get("nama"), whatsapp: fd.get("whatsapp"), program: programValue,
       nominal: fd.get("nominal"), metode: fd.get("metode"), catatan: fd.get("catatan")
     };
     const msg = {
