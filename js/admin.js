@@ -244,7 +244,7 @@ function initCMSForms() {
         tanggal: new Date().toISOString().split("T")[0],
         judul: document.getElementById("b_judul").value,
         ringkasan: document.getElementById("b_ringkasan").value,
-        isi: document.getElementById("b_isi").value
+        isi: document.getElementById("b_isi").value,
         img: document.getElementById("b_img_url").value
       };
       saveOverlayCMS("berita", newItem);
