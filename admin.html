@@ -33,7 +33,7 @@
     </div>
     <button class="btn btn-primary btn-block" type="submit">Masuk</button>
     <p id="loginError" style="color:#A3402C;font-size:.82rem;margin-top:12px;min-height:1.2em;display:none;"></p>
-    <p style="font-size:.76rem;color:#8a9a94;margin-top:18px">Kata sandi bawaan panel ini adalah <code>adminpesantren123</code>.</p>
+    <p style="font-size:.76rem;color:#8a9a94;margin-top:18px">Kata sandi disetel di `js/admin.js`</p>
     <a href="index.html" style="display:inline-block;margin-top:14px;font-size:.82rem;color:var(--emerald)">← Kembali ke website</a>
   </div>
 </form>
@@ -55,13 +55,13 @@
 
   <p class="admin-note">
     <i class="fa-solid fa-circle-info"></i>&nbsp;
-    Perubahan konten Galeri &amp; Berita disimpan dalam penyimpanan lokal browser (LocalStorage) secara sementara. Data pendaftaran santri dan konfirmasi donasi ditarik secara real-time dari Google Sheets.
+    Perubahan konten Galeri &amp; Berita disimpan dalam penyimpanan lokal browser (LocalStorage) secara sementara. Data konfirmasi donasi ditarik secara real-time dari Google Sheets.
   </p>
 
   <div class="admin-tabs">
     <button class="admin-tab tab-btn active" data-target="panel-galeri">Galeri Foto</button>
     <button class="admin-tab tab-btn" data-target="panel-berita">Berita &amp; Informasi</button>
-    <button class="admin-tab tab-btn" data-target="panel-formulir">Pendaftaran &amp; Donasi</button>
+    <button class="admin-tab tab-btn" data-target="panel-formulir">Donasi</button>
   </div>
 
   <section class="admin-panel tab-pane active" id="panel-galeri">
@@ -166,28 +166,7 @@
       <h3 style="margin: 0;">Data Formulir Pesantren</h3>
       <span id="dashboardStatus" style="font-weight: 600; color: var(--emerald); font-size: 0.95rem;"></span>
     </div>
-
-    <div style="margin-bottom: 40px;">
-      <h4 style="margin-bottom: 12px;">Daftar Pendaftaran Santri (Google Sheets)</h4>
-      <div style="overflow-x: auto;">
-        <table id="tablePendaftaran" class="admin-table" style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
-              <th style="padding: 12px 10px;">Tanggal</th>
-              <th style="padding: 12px 10px;">Nama</th>
-              <th style="padding: 12px 10px;">Jenjang</th>
-              <th style="padding: 12px 10px;">L/P</th>
-              <th style="padding: 12px 10px;">WhatsApp</th>
-              <th style="padding: 12px 10px;">Asal Sekolah</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="6" class="text-center" style="padding: 20px; color: #5a7069;">Menghubungkan ke Google Sheets...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
+    
     <div>
       <h4 style="margin-bottom: 12px;">Daftar Konfirmasi Donasi (Google Sheets)</h4>
       <div style="overflow-x: auto;">

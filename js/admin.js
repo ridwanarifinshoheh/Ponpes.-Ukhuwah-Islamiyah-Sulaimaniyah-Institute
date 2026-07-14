@@ -16,7 +16,7 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdE
 /* ============================================================
    1. Autentikasi Sederhana
    ============================================================ */
-const ADMIN_PASSWORD = "adminpesantren123"; // Ganti sebelum upload ke GitHub — lihat README.md
+const ADMIN_PASSWORD = "ukhuwah2026"; // Ganti sebelum upload ke GitHub — lihat README.md
 
 function initAuth() {
   const loginForm = document.getElementById("loginForm");

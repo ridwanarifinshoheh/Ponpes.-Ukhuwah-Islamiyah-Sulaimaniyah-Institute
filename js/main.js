@@ -506,32 +506,6 @@ async function kirimKeAppsScript(payload, statusEl, btnEl, pesanSukses) {
 }
 
 function initForms() {
-  const formP = document.getElementById("formPendaftaran");
-  formP.addEventListener("submit", async e => {
-    e.preventDefault();
-    const statusEl = document.getElementById("pendaftaranStatus");
-    const btnEl = document.getElementById("pendaftaranSubmit");
-    const fd = new FormData(formP);
-    const fotoFile = fd.get("pasFoto");
-    if (fotoFile && fotoFile.size > 1024 * 1024) {
-      statusEl.textContent = "Ukuran pas foto melebihi 1 MB.";
-      statusEl.className = "form-status err";
-      return;
-    }
-    const fotoBase64 = fotoFile && fotoFile.size ? await fileToBase64(fotoFile) : null;
-    const payload = {
-      jenis: "pendaftaran",
-      waktu: new Date().toISOString(),
-      nama: fd.get("nama"), tempatLahir: fd.get("tempatLahir"), tanggalLahir: fd.get("tanggalLahir"),
-      jenisKelamin: fd.get("jenisKelamin"), jenjang: fd.get("jenjang"), namaWali: fd.get("namaWali"),
-      whatsapp: fd.get("whatsapp"), alamat: fd.get("alamat"), asalSekolah: fd.get("asalSekolah"),
-      catatan: fd.get("catatan"),
-      fotoBase64: fotoBase64, fotoNama: fotoFile ? fotoFile.name : ""
-    };
-    const ok = await kirimKeAppsScript(payload, statusEl, btnEl, "Pendaftaran terkirim. Panitia akan menghubungi Anda via WhatsApp.");
-    if (ok) formP.reset();
-  });
-
   const formD = document.getElementById("formDonasi");
   formD.addEventListener("submit", async e => {
     e.preventDefault();

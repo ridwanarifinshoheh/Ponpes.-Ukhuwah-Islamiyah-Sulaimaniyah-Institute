@@ -155,7 +155,7 @@ banyak foto** karena localStorage browser dibatasi sekitar 5 MB.
 
 ## 6. Kata sandi panel admin
 
-Kata sandi disetel di `js/admin.js`:
+Kata sandi disetel di `js/admin.js`
 ```js
 const ADMIN_PASSWORD = "ukhuwah2026";
 ```
