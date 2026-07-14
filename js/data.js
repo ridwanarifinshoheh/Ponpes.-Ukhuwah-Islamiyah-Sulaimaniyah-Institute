@@ -224,27 +224,6 @@ const SITE_DATA = {
     }
   ],
 
-  program_pendidikan: [
-    {
-      jenjang: "Tsanawiyah",
-      deskripsi: "Setara SMP, memadukan kurikulum diniyah dan nasional.",
-      deskripsi_en: "Equivalent to Junior High School, combining religious and national curricula.",
-      deskripsi_tr: "Ortaokula eşdeğer, dini ve ulusal müfredatı harmanlıyor."
-    },
-    {
-      jenjang: "Aliyah",
-      deskripsi: "Setara SMA, dengan penjurusan Keagamaan dan IPA/IPS.",
-      deskripsi_en: "Equivalent to Senior High School, with Religious and Science/Social Studies majors.",
-      deskripsi_tr: "Liseye eşdeğer, Dini ve Fen/Sosyal Bilimler bölümleri mevcut."
-    },
-    {
-      jenjang: "Tahfidz",
-      deskripsi: "Program unggulan menghafal Al-Qur'an dengan target dan bimbingan intensif.",
-      deskripsi_en: "Flagship program for memorizing the Qur'an with intensive targets and guidance.",
-      deskripsi_tr: "Yoğun hedefler ve rehberlik ile Kur'an'ı ezberlemeye yönelik amiral gemisi programı."
-    }
-  ],
-
   donasiProgram: [
     {
       icon: "coin",
