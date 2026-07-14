@@ -74,19 +74,30 @@ async function fetchSheetData(sheetName) {
   }
 }
 
-async function loadDashboardData() {
+async function loadDonasiData() {
   const statusEl = document.getElementById("dashboardStatus");
-  if (statusEl) statusEl.textContent = "Memuat data dari server...";
+  const btnRefresh = document.getElementById("btnRefreshDonasi");
+
+  if (statusEl) { statusEl.textContent = "Memuat data dari server..."; statusEl.style.color = "#5a7069"; }
+  if (btnRefresh) btnRefresh.disabled = true;
 
   const dataDonasi = await fetchSheetData("Donasi");
 
   if (statusEl) {
-    statusEl.textContent = (dataDonasi === null)
-      ? "Gagal terhubung ke Google Sheets. Cek APPS_SCRIPT_URL di admin.js & main.js."
-      : "";
+    if (dataDonasi === null) {
+      statusEl.textContent = "Gagal terhubung ke Google Sheets. Cek APPS_SCRIPT_URL di admin.js & main.js.";
+      statusEl.style.color = "#A3402C";
+    } else {
+      statusEl.textContent = "";
+    }
   }
+  if (btnRefresh) btnRefresh.disabled = false;
 
   renderTableDonasi(dataDonasi || []);
+}
+
+async function loadDashboardData() {
+  await loadDonasiData();
 
   // Render Data Lokal (CMS)
   renderTableCMS("berita");
@@ -269,6 +280,8 @@ function prepareEdit(jenis, id) {
     document.getElementById("b_ringkasan").value = item.ringkasan || "";
     document.getElementById("b_isi").innerHTML = item.isi || "";
     document.getElementById("btnSubmitBerita").textContent = "Update Berita";
+    const cancelBerita = document.getElementById("btnCancelBerita");
+    if (cancelBerita) cancelBerita.style.display = "inline-flex";
     document.getElementById("formTambahBerita").scrollIntoView({ behavior: "smooth", block: "start" });
   } else if (jenis === "galeri") {
     editState.galeri = id;
@@ -277,6 +290,8 @@ function prepareEdit(jenis, id) {
     document.getElementById("g_img_url").value = item.img || "";
     const btn = document.getElementById("btnSubmitGaleri");
     if (btn) btn.textContent = "Update Foto";
+    const cancelGaleri = document.getElementById("btnCancelGaleri");
+    if (cancelGaleri) cancelGaleri.style.display = "inline-flex";
     document.getElementById("formTambahGaleri").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
@@ -284,10 +299,20 @@ function prepareEdit(jenis, id) {
 function cancelEdit(jenis) {
   editState[jenis] = null;
   if (jenis === "berita") {
+    const form = document.getElementById("formTambahBerita");
+    if (form) form.reset();
+    const isi = document.getElementById("b_isi");
+    if (isi) isi.innerHTML = "";
     document.getElementById("btnSubmitBerita").textContent = "Tambah Berita";
+    const cancelBerita = document.getElementById("btnCancelBerita");
+    if (cancelBerita) cancelBerita.style.display = "none";
   } else if (jenis === "galeri") {
+    const form = document.getElementById("formTambahGaleri");
+    if (form) form.reset();
     const btn = document.getElementById("btnSubmitGaleri");
     if (btn) btn.textContent = "Tambah Foto";
+    const cancelGaleri = document.getElementById("btnCancelGaleri");
+    if (cancelGaleri) cancelGaleri.style.display = "none";
   }
 }
 
@@ -312,9 +337,7 @@ function initCMSForms() {
         img: document.getElementById("b_img_url").value
       };
       saveOverlayCMS("berita", newItem);
-      formBerita.reset();
-      document.getElementById("b_isi").innerHTML = ""; // reset() bawaan form tidak membersihkan div contenteditable
-      cancelEdit("berita");
+      cancelEdit("berita"); // reset form + kembalikan tombol ke mode "Tambah"
     });
   }
 
@@ -330,8 +353,7 @@ function initCMSForms() {
         img: document.getElementById("g_img_url").value
       };
       saveOverlayCMS("galeri", newItem);
-      formGaleri.reset();
-      cancelEdit("galeri");
+      cancelEdit("galeri"); // reset form + kembalikan tombol ke mode "Tambah"
     });
   }
 }

@@ -87,7 +87,8 @@
         </div>
       </div>
       <div class="form-foot">
-        <button type="submit" class="btn btn-primary">Tambah Foto</button>
+        <button type="submit" id="btnSubmitGaleri" class="btn btn-primary">Tambah Foto</button>
+        <button type="button" id="btnCancelGaleri" class="btn btn-outline" style="display:none" onclick="cancelEdit('galeri')">Batal Edit</button>
       </div>
     </form>
 
@@ -128,8 +129,8 @@
         </select>
       </div>
       <div class="field">
-        <label for="g_img_url">URL Gambar <span class="req">*</span></label>
-        <input id="g_img_url" placeholder="https://... atau assets/images/nama.jpg/png" required>
+        <label for="b_img_url">URL Gambar <span class="req">*</span></label>
+        <input id="b_img_url" placeholder="https://... atau assets/images/nama.jpg/png" required>
       </div>
       <div class="field full">
         <label for="b_ringkasan">Ringkasan Singkat <span class="req">*</span></label>
@@ -149,6 +150,7 @@
     </div>
     <div class="form-foot">
       <button type="submit" id="btnSubmitBerita" class="btn btn-primary">Tambah Berita</button>
+      <button type="button" id="btnCancelBerita" class="btn btn-outline" style="display:none" onclick="cancelEdit('berita')">Batal Edit</button>
     </div>
   </form>
 
@@ -173,7 +175,13 @@
 
   <section class="admin-panel tab-pane" id="panel-formulir">
     <div>
-      <h4 style="margin-bottom: 12px;">Daftar Konfirmasi Donasi (Google Sheets)</h4>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+        <h4 style="margin:0">Daftar Konfirmasi Donasi (Google Sheets)</h4>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span id="dashboardStatus" style="font-size:.78rem;color:#A3402C"></span>
+          <button type="button" class="btn btn-outline btn-sm" id="btnRefreshDonasi"><i class="fa-solid fa-rotate"></i>&nbsp;Muat Ulang</button>
+        </div>
+      </div>
       <div style="overflow-x: auto;">
         <table id="tableDonasi" class="admin-table" style="width: 100%; border-collapse: collapse;">
           <thead>
