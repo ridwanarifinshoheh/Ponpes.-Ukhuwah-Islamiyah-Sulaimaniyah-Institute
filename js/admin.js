@@ -1,320 +1,461 @@
 /**
- * admin.js — Panel admin Sulaimaniyah Institute
- * ------------------------------------------------------------------------
- * CATATAN KEAMANAN: kata sandi di bawah ini hanya pemeriksaan sisi-klien
- * (client-side) untuk mencegah orang iseng, BUKAN sistem keamanan sungguhan.
- * Siapa pun yang membuka source code file ini bisa melihatnya. Jangan
- * gunakan panel ini untuk menyimpan data yang benar-benar rahasia.
- * Ganti nilai di bawah dengan kata sandimu sendiri sebelum di-push ke GitHub.
+ * admin.js — Logika Panel Admin Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute
+ * ------------------------------------------------------------------------------
+ * Mengatur Autentikasi, CRUD (Galeri & Berita) via Local Storage Overlay,
+ * dan Sinkronisasi (Baca/Tulis) ke Google Sheets via Apps Script.
  */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxG12wdncK7D5MY8zZkXY2BHVXQ3lYC57m7Rv4l1hUR/dev";
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec";
+
 /* ============================================================
-   Storage overlay — kontrak SAMA PERSIS dengan js/main.js
+   1. State & Utility Helper
+   ============================================================ */
+let activeTab = "dashboard";
+let pendaftaranData = [];
+let donasiData = [];
+
+// Format penanggalan dan mata uang
+function formatTanggal(iso) {
+  if (!iso) return "-";
+  try { return new Date(iso).toLocaleDateString('id-ID', { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute:"2-digit" }); }
+  catch (e) { return iso; }
+}
+function formatRupiah(n) {
+  return "Rp" + Number(n || 0).toLocaleString("id-ID");
+}
+
+// Menampilkan Notifikasi (Toast)
+function showToast(message, type = "success") {
+  const toast = document.createElement("div");
+  toast.className = `admin-toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // Asumsi ada CSS animasi masuk. Hapus setelah 3 detik.
+  setTimeout(() => {
+    toast.classList.add("fade-out");
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Helper untuk membaca file gambar menjadi Base64 string
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ============================================================
+   2. Autentikasi (Sederhana via sessionStorage)
+   ============================================================ */
+const ADMIN_PIN = "123456"; // PIN bawaan panel Admin
+
+function checkAuth() {
+  const isLoggedIn = sessionStorage.getItem("psi_admin_logged_in");
+  const loginScreen = document.getElementById("loginScreen");
+  const adminPanel = document.getElementById("adminPanel");
+
+  if (isLoggedIn === "true") {
+    if(loginScreen) loginScreen.style.display = "none";
+    if(adminPanel) adminPanel.style.display = "block";
+    renderAllTables();
+  } else {
+    if(loginScreen) loginScreen.style.display = "flex";
+    if(adminPanel) adminPanel.style.display = "none";
+  }
+}
+
+function initAuth() {
+  const loginBtn = document.getElementById("btnLogin");
+  const logoutBtn = document.getElementById("btnLogout");
+  const pinInput = document.getElementById("adminPin");
+
+  if (loginBtn) {
+    loginBtn.addEventListener("click", () => {
+      if (pinInput.value === ADMIN_PIN) {
+        sessionStorage.setItem("psi_admin_logged_in", "true");
+        showToast("Login berhasil!", "success");
+        checkAuth();
+      } else {
+        showToast("PIN Salah!", "error");
+      }
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      sessionStorage.removeItem("psi_admin_logged_in");
+      showToast("Anda telah keluar.", "success");
+      checkAuth();
+    });
+  }
+}
+
+/* ============================================================
+   3. Manajemen Data Lokal (Overlay) selaras dengan main.js
    ============================================================ */
 function getOverlay(jenis) {
   try { return JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) { return {}; }
 }
-function setOverlay(jenis, obj) { localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(obj)); }
+function setOverlay(jenis, data) {
+  localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(data));
+}
 function getDeleted(jenis) {
   try { return JSON.parse(localStorage.getItem(`psi_deleted_${jenis}`) || "[]"); } catch (e) { return []; }
 }
-function setDeleted(jenis, arr) { localStorage.setItem(`psi_deleted_${jenis}`, JSON.stringify(arr)); }
+function setDeleted(jenis, data) {
+  localStorage.setItem(`psi_deleted_${jenis}`, JSON.stringify(data));
+}
 
-function mergedList(baseArray, jenis) {
+// Menyatukan SITE_DATA.js bawaan dengan data yang belum di-sync
+function getMergedData(baseArray, jenis) {
   const overlay = getOverlay(jenis);
   const deleted = getDeleted(jenis);
+  const map = new Map();
+
+  if(baseArray) baseArray.forEach(item => map.set(item.id, item));
+  Object.values(overlay).forEach(item => map.set(item.id, item));
+  deleted.forEach(id => map.delete(id));
+
+  return Array.from(map.values()).sort((a, b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
+}
+
+function deleteItem(jenis, id) {
+  if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
+
+  const overlay = getOverlay(jenis);
+  if (overlay[id]) {
+    delete overlay[id];
+    setOverlay(jenis, overlay);
+  } else {
+    const deleted = getDeleted(jenis);
+    if (!deleted.includes(id)) {
+      deleted.push(id);
+      setDeleted(jenis, deleted);
+    }
+  }
+  renderAllTables();
+  showToast("Data dihapus (menunggu sinkronisasi).");
+}
+
+/* ============================================================
+   4. Render Tabel Konten (Galeri & Berita)
+   ============================================================ */
+function renderTableGaleri() {
+  const tbody = document.getElementById("tbodyGaleri");
+  if (!tbody || !window.SITE_DATA) return;
+  tbody.innerHTML = "";
+
+  const data = getMergedData(SITE_DATA.galeri, "galeri");
+  data.forEach((item, index) => {Berikut adalah keseluruhan kode **`admin.js`** yang telah disesuaikan agar tersinkronisasi dengan **`main.js`** dan backend **`Code.gs`** (Google Apps Script) menggunakan URL yang sama.
+
+Kode ini mencakup fungsi untuk menarik data (Pendaftaran & Donasi) dari Google Sheets, serta sistem CMS *Client-Side* (menyimpan data modifikasi Berita & Galeri ke `localStorage`) yang formatnya langsung terbaca oleh fungsi `mergeWithOverlay` di halaman utama.
+
+### Kode Lengkap `admin.js`
+
+```javascript
+/**
+ * admin.js — Logika halaman Panel Admin Pesantren Ukhuwah Islamiyah
+ * ------------------------------------------------------------------------------
+ * Mengelola penarikan data dari Google Sheets (melalui Apps Script)
+ * dan sistem CMS sederhana (Berita & Galeri) menggunakan LocalStorage.
+ */
+
+const APPS_SCRIPT_URL = "[https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec](https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec)";
+
+/* ============================================================
+   1. Autentikasi Sederhana
+   ============================================================ */
+function initAuth() {
+  const loginForm = document.getElementById("loginForm");
+  const adminDashboard = document.getElementById("adminDashboard");
+  const loginError = document.getElementById("loginError");
+  const btnLogout = document.getElementById("btnLogout");
+
+  // Cek sesi login di sessionStorage
+  if (sessionStorage.getItem("psi_admin_logged_in") === "true") {
+    if (loginForm) loginForm.style.display = "none";
+    if (adminDashboard) adminDashboard.style.display = "block";
+    loadDashboardData();
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const pass = document.getElementById("adminPassword").value;
+      // Gunakan password sederhana (bisa disesuaikan/diubah nanti)
+      if (pass === "adminpesantren123") {
+        sessionStorage.setItem("psi_admin_logged_in", "true");
+        loginForm.style.display = "none";
+        adminDashboard.style.display = "block";
+        loadDashboardData();
+      } else {
+        loginError.textContent = "Password salah!";
+        loginError.style.display = "block";
+      }
+    });
+  }
+
+  if (btnLogout) {
+    btnLogout.addEventListener("click", () => {
+      sessionStorage.removeItem("psi_admin_logged_in");
+      window.location.reload();
+    });
+  }
+}
+
+/* ============================================================
+   2. Fetch Data dari Apps Script (Google Sheets)
+   ============================================================ */
+async function fetchSheetData(sheetName) {
+  try {
+    // Memanggil endpoint Apps Script dengan parameter GET
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=get&sheet=${sheetName}`);
+    if (!response.ok) throw new Error("Gagal mengambil data dari server.");
+    const result = await response.json();
+    return result.data || [];
+  } catch (error) {
+    console.error(`Error fetching ${sheetName}:`, error);
+    return [];
+  }
+}
+
+async function loadDashboardData() {
+  const statusEl = document.getElementById("dashboardStatus");
+  if (statusEl) statusEl.textContent = "Memuat data dari server...";
+
+  // Ambil data Pendaftaran dan Donasi secara paralel
+  const [dataPendaftaran, dataDonasi] = await Promise.all([
+    fetchSheetData("Pendaftaran"),
+    fetchSheetData("Donasi")
+  ]);
+
+  if (statusEl) statusEl.textContent = "";
+
+  renderTablePendaftaran(dataPendaftaran);
+  renderTableDonasi(dataDonasi);
+
+  // Render Data Lokal (CMS)
+  renderTableCMS("berita");
+  renderTableCMS("galeri");
+}
+
+/* ============================================================
+   3. Render Tabel Data Server (Read-Only)
+   ============================================================ */
+function renderTablePendaftaran(data) {
+  const tbody = document.querySelector("#tablePendaftaran tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center">Belum ada data pendaftaran.</td></tr>`;
+    return;
+  }
+
+  // Asumsi urutan kolom dari backend: Waktu, Nama, Jenjang, L/P, WhatsApp, Asal Sekolah, Status
+  data.forEach((row, index) => {
+    // Lewati baris header jika ikut terbawa
+    if (index === 0 && row[0].toString().toLowerCase() === "waktu") return;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(row[0]).toLocaleDateString("id-ID")}</td>
+      <td><strong>${row[1] || "-"}</strong></td>
+      <td>${row[4] || "-"}</td>
+      <td>${row[3] || "-"}</td>
+      <td><a href="[https://wa.me/$](https://wa.me/$){row[6]}" target="_blank">${row[6] || "-"}</a></td>
+      <td>${row[8] || "-"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderTableDonasi(data) {
+  const tbody = document.querySelector("#tableDonasi tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada data donasi.</td></tr>`;
+    return;
+  }
+
+  // Asumsi urutan kolom dari backend: Waktu, Nama, WhatsApp, Program, Nominal, Metode, Catatan
+  data.forEach((row, index) => {
+    if (index === 0 && row[0].toString().toLowerCase() === "waktu") return;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(row[0]).toLocaleDateString("id-ID")}</td>
+      <td><strong>${row[1] || "-"}</strong></td>
+      <td>${row[2] || "-"}</td>
+      <td>${row[3] || "-"}</td>
+      <td>Rp ${Number(row[4] || 0).toLocaleString("id-ID")}</td>
+      <td>${row[5] || "-"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================================================
+   4. CMS Lokal Sederhana (Berita & Galeri via LocalStorage)
+   ============================================================ */
+function getBaseData(jenis) {
+  // Mengambil data bawaan dari data.js (SITE_DATA)
+  if (jenis === "berita" && typeof SITE_DATA !== "undefined") return SITE_DATA.berita;
+  if (jenis === "galeri" && typeof SITE_DATA !== "undefined") return SITE_DATA.galeri;
+  return [];
+}
+
+function mergeDataCMS(jenis) {
+  let baseArray = getBaseData(jenis);
+  let overlay = {};
+  let deleted = [];
+  try { overlay = JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) {}
+  try { deleted = JSON.parse(localStorage.getItem(`psi_deleted_${jenis}`) || "[]"); } catch (e) {}
+
   const map = new Map();
   baseArray.forEach(item => map.set(item.id, item));
   Object.values(overlay).forEach(item => map.set(item.id, item));
   deleted.forEach(id => map.delete(id));
-  return Array.from(map.values());
-}
-function isBaseId(baseArray, id) { return baseArray.some(i => i.id === id); }
 
-function toast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2200);
-}
-function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; }
-function newId(prefix) { return prefix + Date.now().toString(36); }
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = reject;
-    r.readAsDataURL(file);
+  return Array.from(map.values()).sort((a, b) => {
+    if(a.tanggal && b.tanggal) return new Date(b.tanggal) - new Date(a.tanggal);
+    return 0;
   });
 }
 
-/* ============================================================
-   Login gate
-   ============================================================ */
-function initLogin() {
-  const loginScreen = document.getElementById("loginScreen");
-  const adminScreen = document.getElementById("adminScreen");
+function deleteItem(jenis, id) {
+  if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
 
-  if (sessionStorage.getItem("psi_admin_authed") === "1") {
-    loginScreen.hidden = true;
-    adminScreen.hidden = false;
-    boot();
+  // Tambahkan ke daftar deleted
+  let deleted = [];
+  try { deleted = JSON.parse(localStorage.getItem(`psi_deleted_${jenis}`) || "[]"); } catch (e) {}
+  if (!deleted.includes(id)) deleted.push(id);
+  localStorage.setItem(`psi_deleted_${jenis}`, JSON.stringify(deleted));
+
+  // Hapus dari overlay jika ada
+  let overlay = {};
+  try { overlay = JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) {}
+  if (overlay[id]) {
+    delete overlay[id];
+    localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(overlay));
   }
 
-  document.getElementById("loginForm").addEventListener("submit", e => {
-    e.preventDefault();
-    const val = document.getElementById("loginPass").value;
-    if (val === ADMIN_PASSWORD) {
-      sessionStorage.setItem("psi_admin_authed", "1");
-      loginScreen.hidden = true;
-      adminScreen.hidden = false;
-      boot();
-    } else {
-      document.getElementById("loginError").textContent = "Kata sandi salah. Coba lagi.";
-    }
-  });
+  renderTableCMS(jenis);
+  alert("Data berhasil dihapus. Perubahan akan terlihat di halaman utama pengunjung.");
+}
 
-  document.getElementById("logoutBtn").addEventListener("click", () => {
-    sessionStorage.removeItem("psi_admin_authed");
-    location.reload();
+function saveOverlayCMS(jenis, itemObj) {
+  let overlay = {};
+  try { overlay = JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) {}
+
+  overlay[itemObj.id] = itemObj;
+  localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(overlay));
+
+  renderTableCMS(jenis);
+  alert("Data berhasil disimpan!");
+}
+
+function renderTableCMS(jenis) {
+  const tbody = document.querySelector(`#tableCMS${jenis.charAt(0).toUpperCase() + jenis.slice(1)} tbody`);
+  if (!tbody) return;
+
+  const items = mergeDataCMS(jenis);
+  tbody.innerHTML = "";
+
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center">Tidak ada data.</td></tr>`;
+    return;
+  }
+
+  items.forEach(item => {
+    const tr = document.createElement("tr");
+    const judul = item.judul || item.judul_id || "Tanpa Judul";
+    const infoTambahan = jenis === "berita" ? item.kategori : item.kategori;
+
+    tr.innerHTML = `
+      <td>${item.id}</td>
+      <td><strong>${judul}</strong></td>
+      <td>${infoTambahan}</td>
+      <td>
+        <button class="btn-delete" onclick="deleteItem('${jenis}', '${item.id}')">Hapus</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
   });
 }
 
 /* ============================================================
-   Tabs
+   5. Form Handler untuk Tambah Data CMS
+   ============================================================ */
+function initCMSForms() {
+  const formBerita = document.getElementById("formTambahBerita");
+  if (formBerita) {
+    formBerita.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = "b_" + Date.now();
+      const newItem = {
+        id: id,
+        kategori: document.getElementById("b_kategori").value,
+        tanggal: new Date().toISOString().split("T")[0],
+        judul: document.getElementById("b_judul").value,
+        ringkasan: document.getElementById("b_ringkasan").value,
+        isi: document.getElementById("b_isi").value
+      };
+      saveOverlayCMS("berita", newItem);
+      formBerita.reset();
+    });
+  }
+
+  const formGaleri = document.getElementById("formTambahGaleri");
+  if (formGaleri) {
+    formGaleri.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = "g_" + Date.now();
+      const newItem = {
+        id: id,
+        kategori: document.getElementById("g_kategori").value,
+        judul: document.getElementById("g_judul").value,
+        img: document.getElementById("g_img_url").value // Menggunakan URL eksternal untuk efisiensi localstorage
+      };
+      saveOverlayCMS("galeri", newItem);
+      formGaleri.reset();
+    });
+  }
+}
+
+/* ============================================================
+   6. Navigasi Tab Dashboard
    ============================================================ */
 function initTabs() {
-  document.querySelectorAll(".admin-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
-      tab.classList.add("active");
-      document.getElementById("panel-" + tab.dataset.tab).classList.add("active");
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabPanes = document.querySelectorAll(".tab-pane");
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Hapus state aktif
+      tabBtns.forEach(b => b.classList.remove("active"));
+      tabPanes.forEach(p => p.classList.remove("active"));
+
+      // Set state aktif pada yang di-klik
+      btn.classList.add("active");
+      const targetId = btn.getAttribute("data-target");
+      document.getElementById(targetId).classList.add("active");
     });
   });
 }
 
 /* ============================================================
-   GALERI CRUD
+   INIT
    ============================================================ */
-function renderGaleriList() {
-  const wrap = document.getElementById("listGaleri");
-  wrap.innerHTML = "";
-  const items = mergedList(SITE_DATA.galeri, "galeri");
-  items.forEach(item => {
-    const overlay = getOverlay("galeri");
-    const label = isBaseId(SITE_DATA.galeri, item.id)
-      ? (overlay[item.id] ? "Bawaan (diedit)" : "Bawaan dari data.js")
-      : "Tambahan admin";
-    const row = el(`
-      <div class="admin-row">
-        ${item.img ? `<img src="${item.img}" alt="">` : `<div style="width:56px;height:56px;border-radius:8px;background:var(--emerald-soft);display:flex;align-items:center;justify-content:center;color:var(--emerald)"><i class="fa-solid fa-image"></i></div>`}
-        <div class="meta">
-          <strong>${item.judul}</strong>
-          <span>${item.kategori} · ${label}</span>
-        </div>
-        <div class="row-actions">
-          <button class="icon-btn" data-edit="${item.id}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
-          <button class="icon-btn danger" data-del="${item.id}" aria-label="Hapus"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </div>`);
-    wrap.appendChild(row);
-  });
-
-  wrap.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editGaleri(b.dataset.edit)));
-  wrap.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => deleteItem("galeri", b.dataset.del, renderGaleriList)));
-}
-function editGaleri(id) {
-  const item = mergedList(SITE_DATA.galeri, "galeri").find(i => i.id === id);
-  if (!item) return;
-  document.getElementById("g_id").value = item.id;
-  document.getElementById("g_judul").value = item.judul;
-  document.getElementById("g_kategori").value = item.kategori;
-  document.getElementById("g_img").value = item.img || "";
-  document.getElementById("g_submit").textContent = "Simpan Perubahan";
-  document.getElementById("g_cancel").hidden = false;
-  window.scrollTo({ top: document.getElementById("formGaleri").offsetTop - 20, behavior: "smooth" });
-}
-function resetGaleriForm() {
-  document.getElementById("formGaleri").reset();
-  document.getElementById("g_id").value = "";
-  document.getElementById("g_submit").textContent = "Tambah Foto";
-  document.getElementById("g_cancel").hidden = true;
-}
-function initGaleriForm() {
-  document.getElementById("g_file").addEventListener("change", async e => {
-    const file = e.target.files[0];
-    if (file) document.getElementById("g_img").value = await fileToBase64(file);
-  });
-  document.getElementById("g_cancel").addEventListener("click", resetGaleriForm);
-  document.getElementById("formGaleri").addEventListener("submit", e => {
-    e.preventDefault();
-    const idField = document.getElementById("g_id").value;
-    const id = idField || newId("g");
-    const item = {
-      id,
-      judul: document.getElementById("g_judul").value.trim(),
-      kategori: document.getElementById("g_kategori").value,
-      img: document.getElementById("g_img").value.trim()
-    };
-    const overlay = getOverlay("galeri");
-    overlay[id] = item;
-    setOverlay("galeri", overlay);
-    resetGaleriForm();
-    renderGaleriList();
-    toast(idField ? "Foto diperbarui." : "Foto ditambahkan.");
-  });
-}
-
-/* ============================================================
-   BERITA CRUD
-   ============================================================ */
-function renderBeritaList() {
-  const wrap = document.getElementById("listBerita");
-  wrap.innerHTML = "";
-  const items = mergedList(SITE_DATA.berita, "berita").sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
-  items.forEach(item => {
-    const overlay = getOverlay("berita");
-    const label = isBaseId(SITE_DATA.berita, item.id)
-      ? (overlay[item.id] ? "Bawaan (diedit)" : "Bawaan dari data.js")
-      : "Tambahan admin";
-    const row = el(`
-      <div class="admin-row">
-        <div style="width:56px;height:56px;border-radius:8px;background:var(--emerald-soft);display:flex;align-items:center;justify-content:center;color:var(--emerald);flex:none"><i class="fa-solid fa-newspaper"></i></div>
-        <div class="meta">
-          <strong>${item.judul}</strong>
-          <span>${item.kategori} · ${item.tanggal} · ${label}</span>
-        </div>
-        <div class="row-actions">
-          <button class="icon-btn" data-edit="${item.id}" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
-          <button class="icon-btn danger" data-del="${item.id}" aria-label="Hapus"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </div>`);
-    wrap.appendChild(row);
-  });
-
-  wrap.querySelectorAll("[data-edit]").forEach(b => b.addEventListener("click", () => editBerita(b.dataset.edit)));
-  wrap.querySelectorAll("[data-del]").forEach(b => b.addEventListener("click", () => deleteItem("berita", b.dataset.del, renderBeritaList)));
-}
-function editBerita(id) {
-  const item = mergedList(SITE_DATA.berita, "berita").find(i => i.id === id);
-  if (!item) return;
-  document.getElementById("b_id").value = item.id;
-  document.getElementById("b_judul").value = item.judul;
-  document.getElementById("b_kategori").value = item.kategori;
-  document.getElementById("b_tanggal").value = item.tanggal;
-  document.getElementById("b_ringkasan").value = item.ringkasan;
-  document.getElementById("b_isi").value = item.isi;
-  document.getElementById("b_submit").textContent = "Simpan Perubahan";
-  document.getElementById("b_cancel").hidden = false;
-  window.scrollTo({ top: document.getElementById("formBerita").offsetTop - 20, behavior: "smooth" });
-}
-function resetBeritaForm() {
-  document.getElementById("formBerita").reset();
-  document.getElementById("b_id").value = "";
-  document.getElementById("b_submit").textContent = "Tambah Berita";
-  document.getElementById("b_cancel").hidden = true;
-}
-function initBeritaForm() {
-  document.getElementById("b_cancel").addEventListener("click", resetBeritaForm);
-  document.getElementById("formBerita").addEventListener("submit", e => {
-    e.preventDefault();
-    const idField = document.getElementById("b_id").value;
-    const id = idField || newId("b");
-    const item = {
-      id,
-      judul: document.getElementById("b_judul").value.trim(),
-      kategori: document.getElementById("b_kategori").value,
-      tanggal: document.getElementById("b_tanggal").value,
-      ringkasan: document.getElementById("b_ringkasan").value.trim(),
-      isi: document.getElementById("b_isi").value.trim()
-    };
-    const overlay = getOverlay("berita");
-    overlay[id] = item;
-    setOverlay("berita", overlay);
-    resetBeritaForm();
-    renderBeritaList();
-    toast(idField ? "Berita diperbarui." : "Berita ditambahkan.");
-  });
-}
-
-/* ============================================================
-   Delete (dipakai bersama Galeri & Berita)
-   ============================================================ */
-function deleteItem(jenis, id, rerender) {
-  if (!confirm("Hapus item ini? Tindakan ini hanya memengaruhi tampilan di browser ini.")) return;
-  const overlay = getOverlay(jenis);
-  delete overlay[id];
-  setOverlay(jenis, overlay);
-  const deleted = getDeleted(jenis);
-  if (!deleted.includes(id)) deleted.push(id);
-  setDeleted(jenis, deleted);
-  rerender();
-  toast("Item dihapus.");
-}
-
-/* ============================================================
-   Export / Import / Reset
-   ============================================================ */
-function initBackup() {
-  document.getElementById("exportBtn").addEventListener("click", () => {
-    const payload = {
-      galeri: mergedList(SITE_DATA.galeri, "galeri"),
-      berita: mergedList(SITE_DATA.berita, "berita"),
-      diekspor: new Date().toISOString()
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `sulaimaniyah-konten-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    toast("File JSON diunduh.");
-  });
-
-  document.getElementById("importFile").addEventListener("change", async e => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      if (Array.isArray(data.galeri)) {
-        const overlay = {};
-        data.galeri.forEach(i => (overlay[i.id] = i));
-        setOverlay("galeri", overlay);
-      }
-      if (Array.isArray(data.berita)) {
-        const overlay = {};
-        data.berita.forEach(i => (overlay[i.id] = i));
-        setOverlay("berita", overlay);
-      }
-      renderGaleriList();
-      renderBeritaList();
-      toast("Data berhasil diimpor.");
-    } catch (err) {
-      toast("Gagal membaca file JSON.");
-    }
-    e.target.value = "";
-  });
-
-  document.getElementById("resetBtn").addEventListener("click", () => {
-    if (!confirm("Hapus SEMUA perubahan lokal (galeri & berita) di browser ini? Konten bawaan dari data.js tidak terpengaruh.")) return;
-    ["psi_overlay_galeri", "psi_deleted_galeri", "psi_overlay_berita", "psi_deleted_berita"].forEach(k => localStorage.removeItem(k));
-    renderGaleriList();
-    renderBeritaList();
-    toast("Semua perubahan lokal dihapus.");
-  });
-}
-
-/* ============================================================
-   BOOT
-   ============================================================ */
-function boot() {
+document.addEventListener("DOMContentLoaded", () => {
+  initAuth();
   initTabs();
-  initGaleriForm();
-  initBeritaForm();
-  initBackup();
-  renderGaleriList();
-  renderBeritaList();
-}
-
-document.addEventListener("DOMContentLoaded", initLogin);
+  initCMSForms();
+});
