@@ -471,6 +471,37 @@ function initForms() {
   });
 }
 
+const translations = {
+  id: {
+    navTentang: "Tentang",
+    navFasilitas: "Fasilitas",
+    navPendaftaran: "Pendaftaran",
+    heroTitle: "Menuju Generasi yang <em>Berilmu</em> dan <em>Bertaqwa</em>",
+  },
+  en: {
+    navTentang: "About",
+    navFasilitas: "Facilities",
+    navPendaftaran: "Registration",
+    heroTitle: "Towards a Generation of <em>Knowledge</em> and <em>Piety</em>",
+  },
+  tr: {
+    navTentang: "Hakkımızda",
+    navFasilitas: "Tesisler",
+    navPendaftaran: "Kayıt",
+    heroTitle: "<em>İlim</em> ve <em>Takva</em> Sahibi Bir Nesle Doğru",
+  }
+};
+
+function changeLanguage(lang) {
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const key = element.getAttribute('data-i18n');
+    if (translations[lang] && translations[lang][key]) {
+      element.innerHTML = translations[lang][key];
+    }
+  });
+  document.documentElement.lang = lang;
+}
+
 /* ============================================================
    INIT
    ============================================================ */
@@ -490,4 +521,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initBackToTop();
   initStatsAnimation();
   initForms();
+  changeLanguage(e.target.value);
 });
