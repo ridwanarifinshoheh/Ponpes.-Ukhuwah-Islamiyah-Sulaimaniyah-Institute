@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="Updated Teroke">
+    <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="&#10;&#10;Oke">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/js/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/data.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/admin.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/admin.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,14 +102,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1783841514434</updated>
-    </task>
-    <task id="LOCAL-00006" summary="Commit pembaharuan">
-      <option name="closed" value="true" />
-      <created>1783849254487</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1783849254487</updated>
     </task>
     <task id="LOCAL-00007" summary="Commit pembaharuan">
       <option name="closed" value="true" />
@@ -495,7 +487,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784030221380</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="&#10;&#10;Oke">
+      <option name="closed" value="true" />
+      <created>1784030621363</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1784030621363</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -520,6 +520,7 @@
     <MESSAGE value="Updated besaran" />
     <MESSAGE value="Updated" />
     <MESSAGE value="Updated Teroke" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated Teroke" />
+    <MESSAGE value="&#10;&#10;Oke" />
+    <option name="LAST_COMMIT_MESSAGE" value="&#10;&#10;Oke" />
   </component>
 </project>

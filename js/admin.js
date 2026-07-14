@@ -103,31 +103,6 @@ async function loadDashboardData() {
    header di Google Sheets (lihat PENDAFTARAN_HEADERS / DONASI_HEADERS
    di Code.gs), jadi tidak bergantung pada urutan kolom.
    ============================================================ */
-function renderTablePendaftaran(data) {
-  const tbody = document.querySelector("#tablePendaftaran tbody");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-
-  if (!data || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada data pendaftaran.</td></tr>`;
-    return;
-  }
-
-  data.forEach(row => {
-    const waktu = row["Waktu"];
-    const wa = row["No. WhatsApp"] || "";
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${waktu ? new Date(waktu).toLocaleDateString("id-ID") : "-"}</td>
-      <td><strong>${row["Nama Santri"] || "-"}</strong></td>
-      <td>${row["Jenjang"] || "-"}</td>
-      <td>${row["Jenis Kelamin"] || "-"}</td>
-      <td><a href="https://wa.me/${normalisasiWa(wa)}" target="_blank">${wa || "-"}</a></td>
-      <td>${row["Asal Sekolah"] || "-"}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
 
 function renderTableDonasi(data) {
   const tbody = document.querySelector("#tableDonasi tbody");
