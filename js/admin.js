@@ -7,8 +7,7 @@
  * gunakan panel ini untuk menyimpan data yang benar-benar rahasia.
  * Ganti nilai di bawah dengan kata sandimu sendiri sebelum di-push ke GitHub.
  */
-const ADMIN_PASSWORD = "ukhuwah2026";
-
+const APPS_SCRIPT_URL = "PASTE_URL_WEB_APP_APPS_SCRIPT_DI_SINI";
 /* ============================================================
    Storage overlay — kontrak SAMA PERSIS dengan js/main.js
    ============================================================ */
