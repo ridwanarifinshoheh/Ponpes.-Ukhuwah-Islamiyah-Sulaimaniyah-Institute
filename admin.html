@@ -22,27 +22,23 @@
   </symbol>
 </svg>
 
-<!-- ==================== LOGIN GATE ==================== -->
-<div class="admin-shell" id="loginScreen">
+<form id="loginForm" class="admin-shell" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
   <div class="admin-login">
     <img width="80" height="80" style="display: block; margin: 0 auto 12px auto;" src="assets/image/sulaimaniyah.png" alt="Logo Sulaimaniyah Institute" />
     <h2 style="font-size:1.3rem;margin-bottom:6px">Panel Admin</h2>
     <p style="font-size:.85rem;color:#5a7069;margin-bottom:22px">Khusus pengelola Sulaimaniyah Institute.</p>
-    <form id="loginForm">
-      <div class="field" style="margin-bottom:16px;text-align:left">
-        <label for="loginPass">Kata Sandi</label>
-        <input id="loginPass" type="password" required autocomplete="current-password">
-      </div>
-      <button class="btn btn-primary btn-block" type="submit">Masuk</button>
-      <p id="loginError" style="color:#A3402C;font-size:.82rem;margin-top:12px;min-height:1.2em"></p>
-    </form>
-    <p style="font-size:.76rem;color:#8a9a94;margin-top:18px">Lupa kata sandi? Ubah nilai <code>ADMIN_PASSWORD</code> di file <code>js/admin.js</code>.</p>
+    <div class="field" style="margin-bottom:16px;text-align:left">
+      <label for="adminPassword">Kata Sandi</label>
+      <input id="adminPassword" type="password" required autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Masuk</button>
+    <p id="loginError" style="color:#A3402C;font-size:.82rem;margin-top:12px;min-height:1.2em;display:none;"></p>
+    <p style="font-size:.76rem;color:#8a9a94;margin-top:18px">Kata sandi bawaan panel ini adalah <code>adminpesantren123</code>.</p>
     <a href="index.html" style="display:inline-block;margin-top:14px;font-size:.82rem;color:var(--emerald)">← Kembali ke website</a>
   </div>
-</div>
+</form>
 
-<!-- ==================== ADMIN SHELL ==================== -->
-<div class="admin-shell" id="adminScreen" hidden>
+<div class="admin-shell" id="adminDashboard" style="display: none;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
     <div class="brand">
       <svg class="brand-mark"><use href="#star-mark"/></svg>
@@ -53,27 +49,24 @@
     </div>
     <div style="display:flex;gap:10px">
       <a href="index.html" class="btn btn-outline btn-sm" target="_blank">Lihat Website</a>
-      <button class="btn btn-outline btn-sm" id="logoutBtn">Keluar</button>
+      <button class="btn btn-outline btn-sm" id="btnLogout">Keluar</button>
     </div>
   </div>
 
   <p class="admin-note">
     <i class="fa-solid fa-circle-info"></i>&nbsp;
-    Perubahan di sini tersimpan <strong>hanya di browser ini</strong> (localStorage), sehingga langsung terlihat saat kamu membuka website dari komputer ini, tapi <strong>belum terlihat oleh pengunjung lain</strong>. Untuk menjadikannya permanen, buka tab <strong>Data &amp; Backup</strong>, unduh JSON, lalu salin isinya ke <code>js/data.js</code> dan push ke GitHub.
+    Perubahan konten Galeri &amp; Berita disimpan dalam penyimpanan lokal browser (LocalStorage) secara sementara. Data pendaftaran santri dan konfirmasi donasi ditarik secara real-time dari Google Sheets.
   </p>
 
   <div class="admin-tabs">
-    <button class="admin-tab active" data-tab="galeri">Galeri Foto</button>
-    <button class="admin-tab" data-tab="berita">Berita &amp; Informasi</button>
-    <button class="admin-tab" data-tab="backup">Data &amp; Backup</button>
-    <button class="admin-tab" data-tab="formulir">Pendaftaran &amp; Donasi</button>
+    <button class="admin-tab tab-btn active" data-target="panel-galeri">Galeri Foto</button>
+    <button class="admin-tab tab-btn" data-target="panel-berita">Berita &amp; Informasi</button>
+    <button class="admin-tab tab-btn" data-target="panel-formulir">Pendaftaran &amp; Donasi</button>
   </div>
 
-  <!-- ---------- TAB: GALERI ---------- -->
-  <section class="admin-panel active" id="panel-galeri">
+  <section class="admin-panel tab-pane active" id="panel-galeri">
     <h3 style="margin-bottom:18px">Tambah / Edit Foto</h3>
-    <form id="formGaleri">
-      <input type="hidden" id="g_id">
+    <form id="formTambahGaleri">
       <div class="form-grid">
         <div class="field full">
           <label for="g_judul">Judul Foto <span class="req">*</span></label>
@@ -89,28 +82,38 @@
           </select>
         </div>
         <div class="field">
-          <label for="g_img">URL Gambar</label>
-          <input id="g_img" placeholder="https://... atau assets/images/nama.jpg">
-        </div>
-        <div class="field full">
-          <label for="g_file">Atau unggah file (pratinjau cepat — disimpan sebagai base64 di browser ini)</label>
-          <input id="g_file" type="file" accept="image/*">
-          <small>Untuk web publik permanen, sebaiknya pakai URL gambar yang sudah kamu unggah ke repo/hosting.</small>
+          <label for="g_img_url">URL Gambar <span class="req">*</span></label>
+          <input id="g_img_url" placeholder="https://... atau assets/images/nama.jpg" required>
         </div>
       </div>
       <div class="form-foot">
-        <button type="button" class="btn btn-outline btn-sm" id="g_cancel" hidden>Batal Edit</button>
-        <button type="submit" class="btn btn-primary" id="g_submit">Tambah Foto</button>
+        <button type="submit" class="btn btn-primary">Tambah Foto</button>
       </div>
     </form>
-    <div class="admin-list" id="listGaleri"></div>
+
+    <div style="margin-top: 30px;">
+      <h4 style="margin-bottom: 12px;">Daftar Konten Galeri</h4>
+      <div style="overflow-x: auto;">
+        <table id="tableCMSGaleri" class="admin-table" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+              <th style="padding: 12px 10px;">ID</th>
+              <th style="padding: 12px 10px;">Judul</th>
+              <th style="padding: 12px 10px;">Kategori</th>
+              <th style="padding: 12px 10px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4" class="text-center" style="padding: 20px;">Memuat galeri...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 
-  <!-- ---------- TAB: BERITA ---------- -->
-  <section class="admin-panel" id="panel-berita">
+  <section class="admin-panel tab-pane" id="panel-berita">
     <h3 style="margin-bottom:18px">Tambah / Edit Berita</h3>
-    <form id="formBerita">
-      <input type="hidden" id="b_id">
+    <form id="formTambahBerita">
       <div class="form-grid">
         <div class="field full">
           <label for="b_judul">Judul <span class="req">*</span></label>
@@ -124,10 +127,6 @@
             <option value="artikel">Artikel</option>
           </select>
         </div>
-        <div class="field">
-          <label for="b_tanggal">Tanggal <span class="req">*</span></label>
-          <input id="b_tanggal" type="date" required>
-        </div>
         <div class="field full">
           <label for="b_ringkasan">Ringkasan Singkat <span class="req">*</span></label>
           <textarea id="b_ringkasan" rows="2" required></textarea>
@@ -138,42 +137,77 @@
         </div>
       </div>
       <div class="form-foot">
-        <button type="button" class="btn btn-outline btn-sm" id="b_cancel" hidden>Batal Edit</button>
-        <button type="submit" class="btn btn-primary" id="b_submit">Tambah Berita</button>
+        <button type="submit" class="btn btn-primary">Tambah Berita</button>
       </div>
     </form>
-    <div class="admin-list" id="listBerita"></div>
-  </section>
 
-  <!-- ---------- TAB: BACKUP ---------- -->
-  <section class="admin-panel" id="panel-backup">
-    <h3 style="margin-bottom:10px">Export &amp; Import Data</h3>
-    <p style="font-size:.9rem;color:#4a615a;margin-bottom:22px">
-      Gunakan <strong>Export</strong> untuk mengunduh seluruh perubahan Galeri &amp; Berita di browser ini sebagai file JSON —
-      simpan sebagai cadangan, atau salin isinya ke <code>js/data.js</code> agar permanen untuk semua pengunjung.
-      Gunakan <strong>Import</strong> untuk memuat kembali file cadangan (misalnya di komputer/browser lain).
-    </p>
-    <div style="display:flex;gap:14px;flex-wrap:wrap">
-      <button class="btn btn-primary" id="exportBtn"><i class="fa-solid fa-download"></i>&nbsp; Export JSON</button>
-      <label class="btn btn-outline" style="cursor:pointer">
-        <i class="fa-solid fa-upload"></i>&nbsp; Import JSON
-        <input type="file" id="importFile" accept="application/json" hidden>
-      </label>
-      <button class="btn btn-outline" id="resetBtn" style="border-color:#A3402C;color:#A3402C">
-        <i class="fa-solid fa-trash"></i>&nbsp; Hapus Semua Perubahan Lokal
-      </button>
+    <div style="margin-top: 30px;">
+      <h4 style="margin-bottom: 12px;">Daftar Konten Berita</h4>
+      <div style="overflow-x: auto;">
+        <table id="tableCMSBerita" class="admin-table" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+              <th style="padding: 12px 10px;">ID</th>
+              <th style="padding: 12px 10px;">Judul</th>
+              <th style="padding: 12px 10px;">Kategori</th>
+              <th style="padding: 12px 10px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4" class="text-center" style="padding: 20px;">Memuat berita...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 
-  <!-- ---------- TAB: FORMULIR ---------- -->
-  <section class="admin-panel" id="panel-formulir">
-    <h3 style="margin-bottom:10px">Data Pendaftaran &amp; Donasi</h3>
-    <p style="font-size:.9rem;color:#4a615a">
-      Data formulir <strong>Pendaftaran Santri</strong> dan <strong>Konfirmasi Donasi</strong> dari pengunjung tersimpan otomatis
-      ke Google Sheets melalui backend Apps Script (Code.gs) — bukan di browser ini.
-      Buka Google Sheets yang terhubung ke deployment Code.gs kamu untuk melihat, mengekspor ke Excel/CSV, atau
-      mengunduhnya ke komputer kapan saja. Lihat README.md bagian "Menghubungkan Code.gs" untuk link Sheet kamu.
-    </p>
+  <section class="admin-panel tab-pane" id="panel-formulir">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+      <h3 style="margin: 0;">Data Formulir Pesantren</h3>
+      <span id="dashboardStatus" style="font-weight: 600; color: var(--emerald); font-size: 0.95rem;"></span>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+      <h4 style="margin-bottom: 12px;">Daftar Pendaftaran Santri (Google Sheets)</h4>
+      <div style="overflow-x: auto;">
+        <table id="tablePendaftaran" class="admin-table" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+              <th style="padding: 12px 10px;">Tanggal</th>
+              <th style="padding: 12px 10px;">Nama</th>
+              <th style="padding: 12px 10px;">Jenjang</th>
+              <th style="padding: 12px 10px;">L/P</th>
+              <th style="padding: 12px 10px;">WhatsApp</th>
+              <th style="padding: 12px 10px;">Asal Sekolah</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" class="text-center" style="padding: 20px; color: #5a7069;">Menghubungkan ke Google Sheets...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <h4 style="margin-bottom: 12px;">Daftar Konfirmasi Donasi (Google Sheets)</h4>
+      <div style="overflow-x: auto;">
+        <table id="tableDonasi" class="admin-table" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+              <th style="padding: 12px 10px;">Tanggal</th>
+              <th style="padding: 12px 10px;">Nama Donatur</th>
+              <th style="padding: 12px 10px;">WhatsApp</th>
+              <th style="padding: 12px 10px;">Program</th>
+              <th style="padding: 12px 10px;">Nominal</th>
+              <th style="padding: 12px 10px;">Metode</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" class="text-center" style="padding: 20px; color: #5a7069;">Menghubungkan ke Google Sheets...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </div>
 

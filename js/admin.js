@@ -1,175 +1,23 @@
 /**
  * admin.js — Logika Panel Admin Pesantren Ukhuwah Islamiyah Sulaimaniyah Institute
  * ------------------------------------------------------------------------------
- * Mengatur Autentikasi, CRUD (Galeri & Berita) via Local Storage Overlay,
- * dan Sinkronisasi (Baca/Tulis) ke Google Sheets via Apps Script.
+ * Mengelola:
+ * 1. Autentikasi sederhana (client-side, lihat README.md bagian "Kata sandi panel admin")
+ * 2. Penarikan data Pendaftaran & Donasi dari Google Sheets (via Code.gs)
+ * 3. CMS sederhana untuk Galeri & Berita (disimpan sebagai overlay di localStorage,
+ *    dibaca ulang oleh main.js di halaman utama lewat fungsi mergeWithOverlay yang sama)
+ *
+ * PENTING: samakan URL ini dengan APPS_SCRIPT_URL di js/main.js — keduanya harus
+ * menunjuk ke deployment Apps Script yang sama.
  */
 
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec";
 
 /* ============================================================
-   1. State & Utility Helper
-   ============================================================ */
-let activeTab = "dashboard";
-let pendaftaranData = [];
-let donasiData = [];
-
-// Format penanggalan dan mata uang
-function formatTanggal(iso) {
-  if (!iso) return "-";
-  try { return new Date(iso).toLocaleDateString('id-ID', { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute:"2-digit" }); }
-  catch (e) { return iso; }
-}
-function formatRupiah(n) {
-  return "Rp" + Number(n || 0).toLocaleString("id-ID");
-}
-
-// Menampilkan Notifikasi (Toast)
-function showToast(message, type = "success") {
-  const toast = document.createElement("div");
-  toast.className = `admin-toast ${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-
-  // Asumsi ada CSS animasi masuk. Hapus setelah 3 detik.
-  setTimeout(() => {
-    toast.classList.add("fade-out");
-    setTimeout(() => toast.remove(), 300);
-  }, 3000);
-}
-
-// Helper untuk membaca file gambar menjadi Base64 string
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-/* ============================================================
-   2. Autentikasi (Sederhana via sessionStorage)
-   ============================================================ */
-const ADMIN_PIN = "123456"; // PIN bawaan panel Admin
-
-function checkAuth() {
-  const isLoggedIn = sessionStorage.getItem("psi_admin_logged_in");
-  const loginScreen = document.getElementById("loginScreen");
-  const adminPanel = document.getElementById("adminPanel");
-
-  if (isLoggedIn === "true") {
-    if(loginScreen) loginScreen.style.display = "none";
-    if(adminPanel) adminPanel.style.display = "block";
-    renderAllTables();
-  } else {
-    if(loginScreen) loginScreen.style.display = "flex";
-    if(adminPanel) adminPanel.style.display = "none";
-  }
-}
-
-function initAuth() {
-  const loginBtn = document.getElementById("btnLogin");
-  const logoutBtn = document.getElementById("btnLogout");
-  const pinInput = document.getElementById("adminPin");
-
-  if (loginBtn) {
-    loginBtn.addEventListener("click", () => {
-      if (pinInput.value === ADMIN_PIN) {
-        sessionStorage.setItem("psi_admin_logged_in", "true");
-        showToast("Login berhasil!", "success");
-        checkAuth();
-      } else {
-        showToast("PIN Salah!", "error");
-      }
-    });
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      sessionStorage.removeItem("psi_admin_logged_in");
-      showToast("Anda telah keluar.", "success");
-      checkAuth();
-    });
-  }
-}
-
-/* ============================================================
-   3. Manajemen Data Lokal (Overlay) selaras dengan main.js
-   ============================================================ */
-function getOverlay(jenis) {
-  try { return JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) { return {}; }
-}
-function setOverlay(jenis, data) {
-  localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(data));
-}
-function getDeleted(jenis) {
-  try { return JSON.parse(localStorage.getItem(`psi_deleted_${jenis}`) || "[]"); } catch (e) { return []; }
-}
-function setDeleted(jenis, data) {
-  localStorage.setItem(`psi_deleted_${jenis}`, JSON.stringify(data));
-}
-
-// Menyatukan SITE_DATA.js bawaan dengan data yang belum di-sync
-function getMergedData(baseArray, jenis) {
-  const overlay = getOverlay(jenis);
-  const deleted = getDeleted(jenis);
-  const map = new Map();
-
-  if(baseArray) baseArray.forEach(item => map.set(item.id, item));
-  Object.values(overlay).forEach(item => map.set(item.id, item));
-  deleted.forEach(id => map.delete(id));
-
-  return Array.from(map.values()).sort((a, b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
-}
-
-function deleteItem(jenis, id) {
-  if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
-
-  const overlay = getOverlay(jenis);
-  if (overlay[id]) {
-    delete overlay[id];
-    setOverlay(jenis, overlay);
-  } else {
-    const deleted = getDeleted(jenis);
-    if (!deleted.includes(id)) {
-      deleted.push(id);
-      setDeleted(jenis, deleted);
-    }
-  }
-  renderAllTables();
-  showToast("Data dihapus (menunggu sinkronisasi).");
-}
-
-/* ============================================================
-   4. Render Tabel Konten (Galeri & Berita)
-   ============================================================ */
-function renderTableGaleri() {
-  const tbody = document.getElementById("tbodyGaleri");
-  if (!tbody || !window.SITE_DATA) return;
-  tbody.innerHTML = "";
-
-  const data = getMergedData(SITE_DATA.galeri, "galeri");
-  data.forEach((item, index) => {Berikut adalah keseluruhan kode **`admin.js`** yang telah disesuaikan agar tersinkronisasi dengan **`main.js`** dan backend **`Code.gs`** (Google Apps Script) menggunakan URL yang sama.
-
-Kode ini mencakup fungsi untuk menarik data (Pendaftaran & Donasi) dari Google Sheets, serta sistem CMS *Client-Side* (menyimpan data modifikasi Berita & Galeri ke `localStorage`) yang formatnya langsung terbaca oleh fungsi `mergeWithOverlay` di halaman utama.
-
-### Kode Lengkap `admin.js`
-
-```javascript
-/**
- * admin.js — Logika halaman Panel Admin Pesantren Ukhuwah Islamiyah
- * ------------------------------------------------------------------------------
- * Mengelola penarikan data dari Google Sheets (melalui Apps Script)
- * dan sistem CMS sederhana (Berita & Galeri) menggunakan LocalStorage.
- */
-
-const APPS_SCRIPT_URL = "[https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec](https://script.google.com/macros/s/AKfycbyHZIt_NBOcTBdEuVDE1bwuG8Jfk4hkm0Ibo5a4pBpWy6wGSzOuPVGw-5kI1fm8oaCkfw/exec)";
-
-/* ============================================================
    1. Autentikasi Sederhana
    ============================================================ */
+const ADMIN_PASSWORD = "adminpesantren123"; // Ganti sebelum upload ke GitHub — lihat README.md
+
 function initAuth() {
   const loginForm = document.getElementById("loginForm");
   const adminDashboard = document.getElementById("adminDashboard");
@@ -187,15 +35,17 @@ function initAuth() {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const pass = document.getElementById("adminPassword").value;
-      // Gunakan password sederhana (bisa disesuaikan/diubah nanti)
-      if (pass === "adminpesantren123") {
+      if (pass === ADMIN_PASSWORD) {
         sessionStorage.setItem("psi_admin_logged_in", "true");
         loginForm.style.display = "none";
         adminDashboard.style.display = "block";
+        if (loginError) loginError.style.display = "none";
         loadDashboardData();
       } else {
-        loginError.textContent = "Password salah!";
-        loginError.style.display = "block";
+        if (loginError) {
+          loginError.textContent = "Password salah!";
+          loginError.style.display = "block";
+        }
       }
     });
   }
@@ -213,14 +63,14 @@ function initAuth() {
    ============================================================ */
 async function fetchSheetData(sheetName) {
   try {
-    // Memanggil endpoint Apps Script dengan parameter GET
-    const response = await fetch(`${APPS_SCRIPT_URL}?action=get&sheet=${sheetName}`);
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=get&sheet=${encodeURIComponent(sheetName)}`);
     if (!response.ok) throw new Error("Gagal mengambil data dari server.");
     const result = await response.json();
+    if (result.status !== "ok") throw new Error(result.message || "Gagal mengambil data.");
     return result.data || [];
   } catch (error) {
     console.error(`Error fetching ${sheetName}:`, error);
-    return [];
+    return null; // null = gagal (beda dari [] = berhasil tapi kosong)
   }
 }
 
@@ -228,16 +78,19 @@ async function loadDashboardData() {
   const statusEl = document.getElementById("dashboardStatus");
   if (statusEl) statusEl.textContent = "Memuat data dari server...";
 
-  // Ambil data Pendaftaran dan Donasi secara paralel
   const [dataPendaftaran, dataDonasi] = await Promise.all([
     fetchSheetData("Pendaftaran"),
     fetchSheetData("Donasi")
   ]);
 
-  if (statusEl) statusEl.textContent = "";
+  if (statusEl) {
+    statusEl.textContent = (dataPendaftaran === null || dataDonasi === null)
+      ? "Gagal terhubung ke Google Sheets. Cek APPS_SCRIPT_URL di admin.js & main.js."
+      : "";
+  }
 
-  renderTablePendaftaran(dataPendaftaran);
-  renderTableDonasi(dataDonasi);
+  renderTablePendaftaran(dataPendaftaran || []);
+  renderTableDonasi(dataDonasi || []);
 
   // Render Data Lokal (CMS)
   renderTableCMS("berita");
@@ -246,30 +99,31 @@ async function loadDashboardData() {
 
 /* ============================================================
    3. Render Tabel Data Server (Read-Only)
+   Data yang masuk berbentuk array of object dengan key = nama kolom
+   header di Google Sheets (lihat PENDAFTARAN_HEADERS / DONASI_HEADERS
+   di Code.gs), jadi tidak bergantung pada urutan kolom.
    ============================================================ */
 function renderTablePendaftaran(data) {
   const tbody = document.querySelector("#tablePendaftaran tbody");
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center">Belum ada data pendaftaran.</td></tr>`;
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada data pendaftaran.</td></tr>`;
     return;
   }
 
-  // Asumsi urutan kolom dari backend: Waktu, Nama, Jenjang, L/P, WhatsApp, Asal Sekolah, Status
-  data.forEach((row, index) => {
-    // Lewati baris header jika ikut terbawa
-    if (index === 0 && row[0].toString().toLowerCase() === "waktu") return;
-
+  data.forEach(row => {
+    const waktu = row["Waktu"];
+    const wa = row["No. WhatsApp"] || "";
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${new Date(row[0]).toLocaleDateString("id-ID")}</td>
-      <td><strong>${row[1] || "-"}</strong></td>
-      <td>${row[4] || "-"}</td>
-      <td>${row[3] || "-"}</td>
-      <td><a href="[https://wa.me/$](https://wa.me/$){row[6]}" target="_blank">${row[6] || "-"}</a></td>
-      <td>${row[8] || "-"}</td>
+      <td>${waktu ? new Date(waktu).toLocaleDateString("id-ID") : "-"}</td>
+      <td><strong>${row["Nama Santri"] || "-"}</strong></td>
+      <td>${row["Jenjang"] || "-"}</td>
+      <td>${row["Jenis Kelamin"] || "-"}</td>
+      <td><a href="https://wa.me/${normalisasiWa(wa)}" target="_blank">${wa || "-"}</a></td>
+      <td>${row["Asal Sekolah"] || "-"}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -280,40 +134,47 @@ function renderTableDonasi(data) {
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada data donasi.</td></tr>`;
     return;
   }
 
-  // Asumsi urutan kolom dari backend: Waktu, Nama, WhatsApp, Program, Nominal, Metode, Catatan
-  data.forEach((row, index) => {
-    if (index === 0 && row[0].toString().toLowerCase() === "waktu") return;
-
+  data.forEach(row => {
+    const waktu = row["Waktu"];
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${new Date(row[0]).toLocaleDateString("id-ID")}</td>
-      <td><strong>${row[1] || "-"}</strong></td>
-      <td>${row[2] || "-"}</td>
-      <td>${row[3] || "-"}</td>
-      <td>Rp ${Number(row[4] || 0).toLocaleString("id-ID")}</td>
-      <td>${row[5] || "-"}</td>
+      <td>${waktu ? new Date(waktu).toLocaleDateString("id-ID") : "-"}</td>
+      <td><strong>${row["Nama Donatur"] || "-"}</strong></td>
+      <td>${row["No. WhatsApp"] || "-"}</td>
+      <td>${row["Program"] || "-"}</td>
+      <td>Rp ${Number(row["Nominal"] || 0).toLocaleString("id-ID")}</td>
+      <td>${row["Metode"] || "-"}</td>
     `;
     tbody.appendChild(tr);
   });
 }
 
+// Bersihkan nomor WhatsApp jadi format internasional (62...) untuk link wa.me
+function normalisasiWa(nomor) {
+  let n = String(nomor || "").replace(/[^0-9]/g, "");
+  if (n.startsWith("0")) n = "62" + n.slice(1);
+  return n;
+}
+
 /* ============================================================
    4. CMS Lokal Sederhana (Berita & Galeri via LocalStorage)
+   Format overlay harus sama persis dengan yang dibaca main.js
+   (fungsi mergeWithOverlay), supaya perubahan di sini konsisten
+   dengan yang tampil di halaman utama.
    ============================================================ */
 function getBaseData(jenis) {
-  // Mengambil data bawaan dari data.js (SITE_DATA)
   if (jenis === "berita" && typeof SITE_DATA !== "undefined") return SITE_DATA.berita;
   if (jenis === "galeri" && typeof SITE_DATA !== "undefined") return SITE_DATA.galeri;
   return [];
 }
 
 function mergeDataCMS(jenis) {
-  let baseArray = getBaseData(jenis);
+  const baseArray = getBaseData(jenis);
   let overlay = {};
   let deleted = [];
   try { overlay = JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) {}
@@ -325,7 +186,7 @@ function mergeDataCMS(jenis) {
   deleted.forEach(id => map.delete(id));
 
   return Array.from(map.values()).sort((a, b) => {
-    if(a.tanggal && b.tanggal) return new Date(b.tanggal) - new Date(a.tanggal);
+    if (a.tanggal && b.tanggal) return new Date(b.tanggal) - new Date(a.tanggal);
     return 0;
   });
 }
@@ -333,13 +194,11 @@ function mergeDataCMS(jenis) {
 function deleteItem(jenis, id) {
   if (!confirm("Apakah Anda yakin ingin menghapus item ini?")) return;
 
-  // Tambahkan ke daftar deleted
   let deleted = [];
   try { deleted = JSON.parse(localStorage.getItem(`psi_deleted_${jenis}`) || "[]"); } catch (e) {}
   if (!deleted.includes(id)) deleted.push(id);
   localStorage.setItem(`psi_deleted_${jenis}`, JSON.stringify(deleted));
 
-  // Hapus dari overlay jika ada
   let overlay = {};
   try { overlay = JSON.parse(localStorage.getItem(`psi_overlay_${jenis}`) || "{}"); } catch (e) {}
   if (overlay[id]) {
@@ -348,7 +207,7 @@ function deleteItem(jenis, id) {
   }
 
   renderTableCMS(jenis);
-  alert("Data berhasil dihapus. Perubahan akan terlihat di halaman utama pengunjung.");
+  showToast("Data dihapus. Perubahan akan terlihat di halaman utama pengunjung (browser ini).");
 }
 
 function saveOverlayCMS(jenis, itemObj) {
@@ -359,7 +218,7 @@ function saveOverlayCMS(jenis, itemObj) {
   localStorage.setItem(`psi_overlay_${jenis}`, JSON.stringify(overlay));
 
   renderTableCMS(jenis);
-  alert("Data berhasil disimpan!");
+  showToast("Data berhasil disimpan!");
 }
 
 function renderTableCMS(jenis) {
@@ -376,18 +235,22 @@ function renderTableCMS(jenis) {
 
   items.forEach(item => {
     const tr = document.createElement("tr");
-    const judul = item.judul || item.judul_id || "Tanpa Judul";
-    const infoTambahan = jenis === "berita" ? item.kategori : item.kategori;
+    const judul = item.judul || "Tanpa Judul";
 
     tr.innerHTML = `
       <td>${item.id}</td>
       <td><strong>${judul}</strong></td>
-      <td>${infoTambahan}</td>
+      <td>${item.kategori || "-"}</td>
       <td>
-        <button class="btn-delete" onclick="deleteItem('${jenis}', '${item.id}')">Hapus</button>
+        <button type="button" class="btn btn-outline btn-sm btn-delete" data-jenis="${jenis}" data-id="${item.id}">Hapus</button>
       </td>
     `;
     tbody.appendChild(tr);
+  });
+
+  // Delegasi event tombol hapus (menghindari inline onclick + masalah escaping id)
+  tbody.querySelectorAll(".btn-delete").forEach(btn => {
+    btn.addEventListener("click", () => deleteItem(btn.dataset.jenis, btn.dataset.id));
   });
 }
 
@@ -422,7 +285,7 @@ function initCMSForms() {
         id: id,
         kategori: document.getElementById("g_kategori").value,
         judul: document.getElementById("g_judul").value,
-        img: document.getElementById("g_img_url").value // Menggunakan URL eksternal untuk efisiensi localstorage
+        img: document.getElementById("g_img_url").value
       };
       saveOverlayCMS("galeri", newItem);
       formGaleri.reset();
@@ -439,16 +302,26 @@ function initTabs() {
 
   tabBtns.forEach(btn => {
     btn.addEventListener("click", () => {
-      // Hapus state aktif
       tabBtns.forEach(b => b.classList.remove("active"));
       tabPanes.forEach(p => p.classList.remove("active"));
 
-      // Set state aktif pada yang di-klik
       btn.classList.add("active");
       const targetId = btn.getAttribute("data-target");
-      document.getElementById(targetId).classList.add("active");
+      const target = document.getElementById(targetId);
+      if (target) target.classList.add("active");
     });
   });
+}
+
+/* ============================================================
+   7. Toast Notifikasi
+   ============================================================ */
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) { alert(message); return; }
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
 /* ============================================================
