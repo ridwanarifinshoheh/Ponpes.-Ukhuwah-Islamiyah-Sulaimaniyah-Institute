@@ -78,18 +78,14 @@ async function loadDashboardData() {
   const statusEl = document.getElementById("dashboardStatus");
   if (statusEl) statusEl.textContent = "Memuat data dari server...";
 
-  const [dataPendaftaran, dataDonasi] = await Promise.all([
-    fetchSheetData("Pendaftaran"),
-    fetchSheetData("Donasi")
-  ]);
+  const dataDonasi = await fetchSheetData("Donasi");
 
   if (statusEl) {
-    statusEl.textContent = (dataPendaftaran === null || dataDonasi === null)
+    statusEl.textContent = (dataDonasi === null)
       ? "Gagal terhubung ke Google Sheets. Cek APPS_SCRIPT_URL di admin.js & main.js."
       : "";
   }
 
-  renderTablePendaftaran(dataPendaftaran || []);
   renderTableDonasi(dataDonasi || []);
 
   // Render Data Lokal (CMS)
@@ -116,11 +112,12 @@ function renderTableDonasi(data) {
 
   data.forEach(row => {
     const waktu = row["Waktu"];
+    const wa = row["No. WhatsApp"] || "";
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${waktu ? new Date(waktu).toLocaleDateString("id-ID") : "-"}</td>
       <td><strong>${row["Nama Donatur"] || "-"}</strong></td>
-      <td>${row["No. WhatsApp"] || "-"}</td>
+      <td>${wa ? `<a href="https://wa.me/${normalisasiWa(wa)}" target="_blank">${wa}</a>` : "-"}</td>
       <td>${row["Program"] || "-"}</td>
       <td>Rp ${Number(row["Nominal"] || 0).toLocaleString("id-ID")}</td>
       <td>${row["Metode"] || "-"}</td>
@@ -197,14 +194,12 @@ function saveOverlayCMS(jenis, itemObj) {
 }
 
 function renderTableCMS(jenis) {
-  function renderTableCMS(jenis) {
-  const tbody = document.getElementById(jenis === "galeri" ? "tbodyGaleri" : "tbodyBerita");
+  const tbody = document.querySelector(`#tableCMS${jenis.charAt(0).toUpperCase() + jenis.slice(1)} tbody`);
   if (!tbody) return;
   tbody.innerHTML = "";
 
   // Menggabungkan data bawaan dari data.js dengan data buatan admin di localStorage
-  const baseArray = jenis === "galeri" ? (SITE_DATA.galeri || []) : (SITE_DATA.berita || []);
-  const items = mergeWithOverlay(baseArray, jenis);
+  const items = mergeDataCMS(jenis);
 
   if (items.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4" class="text-center" style="padding:20px;">Belum ada data.</td></tr>`;
@@ -215,7 +210,7 @@ function renderTableCMS(jenis) {
     const tr = document.createElement("tr");
     const judul = item.judul || "Tanpa Judul";
 
-    // KODE BARU: Membuat elemen pratinjau gambar mini untuk tabel Admin
+    // Pratinjau gambar mini untuk tabel Admin
     const imgPreview = item.img
       ? `<img src="${item.img}" alt="Preview" style="width: 45px; height: 45px; object-fit: cover; border-radius: 6px; margin-right: 12px; vertical-align: middle; flex-shrink: 0; border: 1px solid var(--emerald-soft);">`
       : `<div style="width: 45px; height: 45px; border-radius: 6px; margin-right: 12px; background: var(--emerald-soft); display: flex; align-items: center; justify-content: center; color: var(--emerald); flex-shrink: 0;"><i class="fa-solid fa-image"></i></div>`;
@@ -234,6 +229,11 @@ function renderTableCMS(jenis) {
       </td>
     `;
     tbody.appendChild(tr);
+  });
+
+  // Delegasi event tombol hapus (dipasang ulang tiap render karena tbody di-innerHTML)
+  tbody.querySelectorAll(".btn-delete").forEach(btn => {
+    btn.addEventListener("click", () => deleteItem(btn.dataset.jenis, btn.dataset.id));
   });
 }
 
