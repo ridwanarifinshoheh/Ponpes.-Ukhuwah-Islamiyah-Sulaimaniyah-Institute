@@ -31,7 +31,7 @@ function getLoc(obj, key) {
 }
 
 const ICONS = {
-  mosque: "fa-mosque", book: "fa-book-open", home: "fa-house", flask: "fa-flask",
+  mosque: "fa-mosque", book: "fa-book-open", home: "fa-house", flask: "fa-flask", parkiran_motor: "fa-motorcycle",
   heart: "fa-heart-pulse", ball: "fa-futbol", pakaian: "fa-shirt", wifi: "fa-wifi", jalan_jalan: "fa-suitcase-rolling", ruangan: "fa-door-open",
   coin: "fa-coins", building: "fa-building", scholar: "fa-graduation-cap", hands: "fa-hand-holding-heart",lemari: "fa-door-closed",
 };
