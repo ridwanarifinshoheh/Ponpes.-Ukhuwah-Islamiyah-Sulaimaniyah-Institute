@@ -119,12 +119,12 @@ const SITE_DATA = {
     },
     {
       icon: "parkiran_motor",
-      judul: "Lapangan Olahraga",
-      judul_en: "Sports Field",
-      judul_tr: "Spor Sahası",
-      deskripsi: "Area olahraga untuk menjaga kebugaran jasmani santri.",
-      deskripsi_en: "Sports area to maintain students' physical fitness.",
-      deskripsi_tr: "Talebelerin fiziksel zindeliğini korumak için spor alanı."
+      judul: "Area Parkiran",
+      judul_en: "Parking Area",
+      judul_tr: "Otopark Alanı",
+      deskripsi: "Area perkir terbuka dengan keamanan yang dijaga oleh petugas.",
+      deskripsi_en: "An open parking area with security provided by staff.",
+      deskripsi_tr: "Güvenlik görevlileri tarafından korunan açık otopark alanı."
     }
   ],
 
