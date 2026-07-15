@@ -109,16 +109,16 @@ const SITE_DATA = {
       deskripsi_tr: "Gardırop ve kitaplık olanakları, kolaylık ve konforu destekliyor."
     },
     {
-      icon: "heart",
-      judul: "Klinik Kesehatan Santri",
-      judul_en: "Student Health Clinic",
-      judul_tr: "Talebe Sağlık Kliniği",
-      deskripsi: "Layanan kesehatan dasar dan pemantauan gizi santri secara rutin.",
-      deskripsi_en: "Basic health services and regular monitoring of students' nutrition.",
-      deskripsi_tr: "Temel sağlık hizmetleri ve talebelerin beslenmesinin düzenli takibi."
+      icon: "wifi",
+      judul: "Wifi Gratis",
+      judul_en: "Free Wi-Fi",
+      judul_tr: "Ücretsiz Wi-Fi",
+      deskripsi: "Layanan wifi gratis menunjang kebutuhan mahasantri dalam tugas kuliah dan pengembangan diri.",
+      deskripsi_en: "Free Wi-Fi service supports the needs of college students in their academic work and personal development.",
+      deskripsi_tr: "Ücretsiz Wi-Fi hizmeti, öğrencilerin ders ödevleri ve kişisel gelişim ihtiyaçlarını desteklemektedir."
     },
     {
-      icon: "ball",
+      icon: "parkiran_motor",
       judul: "Lapangan Olahraga",
       judul_en: "Sports Field",
       judul_tr: "Spor Sahası",
