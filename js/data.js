@@ -74,12 +74,12 @@ const SITE_DATA = {
   fasilitas: [
     {
       icon: "mosque",
-      judul: "Masjid & Aula Utama",
-      judul_en: "Mosque & Main Hall",
-      judul_tr: "Mescit & Ana Salon",
-      deskripsi: "Pusat ibadah dan kegiatan keagamaan santri, menampung lebih dari 500 jamaah.",
-      deskripsi_en: "Center for worship and religious activities, accommodating more than 500 worshippers.",
-      deskripsi_tr: "500'den fazla cemaati ağırlayabilen ibadet ve dini faaliyetler merkezi."
+      judul: "Mushollah & Ruang Belajar Full AC.",
+      judul_en: "Prayer Room & Study Room with Full Air Conditioning.",
+      judul_tr: "Tamamen Klimalı Namaz Odası ve Çalışma Odası.",
+      deskripsi: "Tempat ibadah dan kegiatan belajar mahasantri.",
+      deskripsi_en: "A place of worship and a learning center for students.",
+      deskripsi_tr: "İbadet yeri ve öğrencilerin öğrenim faaliyetleri."
     },
     {
       icon: "book",
