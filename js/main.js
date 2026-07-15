@@ -636,7 +636,7 @@ const translations = {
     tentangTitle: "Mengenal Sulaimaniyah Institute",
     visiTitle: "Visi",
     fasilitasTitle: "Fasilitas Pesantren",
-    fasilitasSubtitle: "Sarana dan prasarana yang mendukung kenyamanan dan proses belajar santri sehari-hari.",
+    fasilitasSubtitle: "Sarana dan prasarana yang mendukung kenyamanan dan proses belajar mahasantri sehari-hari.",
     galeriTitle: "Galeri Kegiatan Pesantren",
     galeriSubtitle: "Dokumentasi keseharian, kegiatan belajar, dan acara-acara santri.",
     galeriEmpty: "Belum ada foto pada kategori ini.",
