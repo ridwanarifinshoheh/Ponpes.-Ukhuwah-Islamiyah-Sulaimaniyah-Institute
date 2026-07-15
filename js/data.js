@@ -91,22 +91,22 @@ const SITE_DATA = {
       deskripsi_tr: "Klasik İslami eserler, genel ders kitapları koleksiyonu ve rahat bir okuma odası."
     },
     {
-      icon: "home",
-      judul: "Asrama Putra",
-      judul_en: "Boys' Dormitory",
-      judul_tr: "Erkek Yurdu",
-      deskripsi: "Asrama terpisah dengan pembina yang mendampingi keseharian santri.",
-      deskripsi_en: "Separate dormitory with mentors assisting students in their daily lives.",
-      deskripsi_tr: "Talebelerin günlük yaşamlarında onlara rehberlik eden hocaların bulunduğu ayrı yurt."
+      icon: "ruangan",
+      judul: "Ruang Makan & Kamar Tidur",
+      judul_en: "Dining Room & Bedroom",
+      judul_tr: "Yemek Odası ve Yatak Odası",
+      deskripsi: "Ruang makan teratur dan kamar tidur yang nyaman.",
+      deskripsi_en: "A tidy dining room and a comfortable bedroom.",
+      deskripsi_tr: "Düzenli bir yemek odası ve konforlu bir yatak odası."
     },
     {
-      icon: "flask",
-      judul: "Laboratorium & Ruang Kelas",
-      judul_en: "Laboratory & Classrooms",
-      judul_tr: "Laboratuvar & Sınıflar",
-      deskripsi: "Ruang belajar formal dengan fasilitas penunjang sains dan komputer.",
-      deskripsi_en: "Formal learning spaces with science and computer support facilities.",
-      deskripsi_tr: "Fen ve bilgisayar destek tesislerine sahip resmi öğrenim alanları."
+      icon: "lemari",
+      judul: "Lemari Pakaian & Lemari Buku",
+      judul_en: "Clothing Closets & Bookcases",
+      judul_tr: "Gardırop ve Kitaplık",
+      deskripsi: "Fasilitas lemari pakaian dan buku menunjang kemudahan dan kenyamanan.",
+      deskripsi_en: "The wardrobe and bookshelf provide convenience and comfort.",
+      deskripsi_tr: "Gardırop ve kitaplık olanakları, kolaylık ve konforu destekliyor."
     },
     {
       icon: "heart",

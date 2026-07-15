@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="Oke">
+    <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="Updated">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/data.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/data.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,14 +103,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1783841514434</updated>
-    </task>
-    <task id="LOCAL-00028" summary="Updated">
-      <option name="closed" value="true" />
-      <created>1783868290304</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1783868290304</updated>
     </task>
     <task id="LOCAL-00029" summary="Updated">
       <option name="closed" value="true" />
@@ -495,7 +488,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784042623714</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="Updated">
+      <option name="closed" value="true" />
+      <created>1784096058602</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1784096058603</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -518,10 +519,10 @@
     <MESSAGE value="Script Updated." />
     <MESSAGE value="Updated Logo" />
     <MESSAGE value="Updated besaran" />
-    <MESSAGE value="Updated" />
     <MESSAGE value="Updated Teroke" />
     <MESSAGE value="&#10;&#10;Oke" />
     <MESSAGE value="Oke" />
-    <option name="LAST_COMMIT_MESSAGE" value="Oke" />
+    <MESSAGE value="Updated" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated" />
   </component>
 </project>
