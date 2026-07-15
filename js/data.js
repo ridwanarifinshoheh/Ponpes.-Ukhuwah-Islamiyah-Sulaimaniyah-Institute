@@ -57,7 +57,7 @@ const SITE_DATA = {
         tr: "Günlük adap ve ahlakın geliştirilmesi ile Arapça ve Türkçe dillerine hakimiyet."
       },
       {
-        id: "Menumbuhkan semangat ukhuwah islamiyah antar santri dan masyarakat",
+        id: "Menumbuhkan semangat ukhuwah islamiyah antar santri dan masyarakat.",
         en: "Fostering the spirit of Islamic brotherhood among students and the community.",
         tr: "Öğrenciler ve toplum arasında İslam kardeşliği (uhuvvet) ruhunu teşvik etmek."
       }
