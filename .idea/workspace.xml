@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c4d37774-b6f1-4d41-ae79-58f86e66c714" name="Changes" comment="Updated">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -104,14 +102,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1783841514434</updated>
-    </task>
-    <task id="LOCAL-00043" summary="Updated besaran">
-      <option name="closed" value="true" />
-      <created>1784006326558</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1784006326558</updated>
     </task>
     <task id="LOCAL-00044" summary="Updated besaran">
       <option name="closed" value="true" />
@@ -497,7 +487,15 @@
       <option name="project" value="LOCAL" />
       <updated>1784357058052</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="Updated">
+      <option name="closed" value="true" />
+      <created>1784357293118</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1784357293118</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
