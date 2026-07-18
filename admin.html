@@ -13,28 +13,33 @@
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="star-mark" viewBox="0 0 64 64">
-    <circle cx="32" cy="32" r="31" fill="#2a7a65"/>
-    <g fill="none" stroke="#faedcd" stroke-width="2">
+    <circle cx="32" cy="32" r="31" fill="var(--primary-deep)"/>
+    <g fill="none" stroke="var(--accent-light)" stroke-width="2">
       <rect x="15" y="15" width="34" height="34"/>
       <rect x="15" y="15" width="34" height="34" transform="rotate(45 32 32)"/>
     </g>
-    <circle cx="32" cy="32" r="6" fill="#faedcd"/>
+    <circle cx="32" cy="32" r="6" fill="var(--accent-light)"/>
   </symbol>
 </svg>
 
-<form id="loginForm" class="admin-shell" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+<form id="loginForm" class="admin-shell" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; position:relative;">
+  
+  <div style="position:absolute; top:24px; right:24px;">
+    <button id="themeToggle" class="btn-theme-toggle" aria-label="Ganti Tema" style="border:1px solid var(--border-color); color:var(--text-main); border-radius:50%; width:38px; height:38px;"><i class="fa-solid fa-moon"></i></button>
+  </div>
+
   <div class="admin-login">
     <img width="80" height="80" style="display: block; margin: 0 auto 12px auto;" src="assets/image/sulaimaniyah.png" alt="Logo Sulaimaniyah Institute" />
     <h2 style="font-size:1.3rem;margin-bottom:6px">Panel Admin</h2>
-    <p style="font-size:.85rem;color:#5c6c7b;margin-bottom:22px">Khusus pengelola Sulaimaniyah Institute.</p>
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:22px">Khusus pengelola Sulaimaniyah Institute.</p>
     <div class="field" style="margin-bottom:16px;text-align:left">
       <label for="adminPassword">Kata Sandi</label>
       <input id="adminPassword" type="password" required autocomplete="current-password">
     </div>
     <button class="btn btn-primary btn-block" type="submit">Masuk</button>
-    <p id="loginError" style="color:#A3402C;font-size:.82rem;margin-top:12px;min-height:1.2em;display:none;"></p>
-    <p style="font-size:.76rem;color:#8a9a94;margin-top:18px">Kata sandi disetel di `js/admin.js`</p>
-    <a href="index.html" style="display:inline-block;margin-top:14px;font-size:.82rem;color:var(--emerald)">← Kembali ke website</a>
+    <p id="loginError" style="color:var(--danger);font-size:.82rem;margin-top:12px;min-height:1.2em;display:none;"></p>
+    <p style="font-size:.76rem;color:var(--text-muted);margin-top:18px">Kata sandi disetel di `js/admin.js`</p>
+    <a href="index.html" style="display:inline-block;margin-top:14px;font-size:.82rem;color:var(--primary)">← Kembali ke website</a>
   </div>
 </form>
 
@@ -43,11 +48,12 @@
     <div class="brand">
       <img width="50" height="50" style="display: block; margin: 0 auto 12px auto;" src="assets/image/sulaimaniyah.png" alt="Logo Sulaimaniyah Institute" />
       <span class="brand-text">
-        <strong>Panel Admin</strong>
+        <strong style="color:var(--primary-deep)">Panel Admin</strong>
         <span>Sulaimaniyah Institute</span>
       </span>
     </div>
-    <div style="display:flex;gap:10px">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button id="themeToggleDash" class="btn-theme-toggle" aria-label="Ganti Tema" style="border:1px solid var(--border-color); color:var(--text-main); border-radius:50%; width:36px; height:36px;"><i class="fa-solid fa-moon"></i></button>
       <a href="index.html" class="btn btn-outline btn-sm" target="_blank">Lihat Website</a>
       <button class="btn btn-outline btn-sm" id="btnLogout">Keluar</button>
     </div>
@@ -97,7 +103,7 @@
       <div style="overflow-x: auto;">
         <table id="tableCMSGaleri" class="admin-table" style="width: 100%; border-collapse: collapse;">
           <thead>
-            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+            <tr style="text-align: left; background: var(--primary-soft); border-bottom: 2px solid var(--primary);">
               <th style="padding: 12px 10px;">ID</th>
               <th style="padding: 12px 10px;">Judul</th>
               <th style="padding: 12px 10px;">Kategori</th>
@@ -137,7 +143,6 @@
         <textarea id="b_ringkasan" rows="2" required></textarea>
       </div>
 
-      <!-- REVISI: Mengganti textarea b_isi dengan Editor -->
       <div class="field full">
         <label>Isi Lengkap <span class="req">*</span></label>
         <div class="editor-toolbar" style="margin-bottom: 5px;">
@@ -145,7 +150,7 @@
           <button type="button" class="btn-sm" onclick="document.execCommand('italic', false, null)"><i>I</i></button>
           <button type="button" class="btn-sm" onclick="document.execCommand('underline', false, null)"><u>U</u></button>
         </div>
-        <div id="b_isi" contenteditable="true" style="min-height: 150px; border: 1px solid #ccc; padding: 10px; border-radius: 4px; background: #fff;"></div>
+        <div id="b_isi" contenteditable="true" style="min-height: 150px; border: 1px solid var(--border-color); padding: 10px; border-radius: 4px; background: var(--card-bg); color: var(--text-main);"></div>
       </div>
     </div>
     <div class="form-foot">
@@ -154,17 +159,16 @@
     </div>
   </form>
 
-  <!-- Tabel daftar berita -->
   <div style="margin-top: 30px;">
     <h4 style="margin-bottom: 12px;">Daftar Konten Berita</h4>
     <div style="overflow-x: auto;">
       <table id="tableCMSBerita" class="admin-table" style="width: 100%; border-collapse: collapse;">
         <thead>
-          <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+          <tr style="text-align: left; background: var(--primary-soft); border-bottom: 2px solid var(--primary);">
             <th style="padding: 12px 10px;">ID</th>
             <th style="padding: 12px 10px;">Judul</th>
             <th style="padding: 12px 10px;">Kategori</th>
-            <th style="padding: 12px 10px;">Aksi</th> <!-- Kolom Aksi -->
+            <th style="padding: 12px 10px;">Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -178,14 +182,14 @@
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">
         <h4 style="margin:0">Daftar Konfirmasi Donasi (Google Sheets)</h4>
         <div style="display:flex;align-items:center;gap:12px">
-          <span id="dashboardStatus" style="font-size:.78rem;color:#A3402C"></span>
+          <span id="dashboardStatus" style="font-size:.78rem;color:var(--danger)"></span>
           <button type="button" class="btn btn-outline btn-sm" id="btnRefreshDonasi"><i class="fa-solid fa-rotate"></i>&nbsp;Muat Ulang</button>
         </div>
       </div>
       <div style="overflow-x: auto;">
         <table id="tableDonasi" class="admin-table" style="width: 100%; border-collapse: collapse;">
           <thead>
-            <tr style="text-align: left; background: var(--emerald-soft); border-bottom: 2px solid var(--emerald);">
+            <tr style="text-align: left; background: var(--primary-soft); border-bottom: 2px solid var(--primary);">
               <th style="padding: 12px 10px;">Tanggal</th>
               <th style="padding: 12px 10px;">Nama Donatur</th>
               <th style="padding: 12px 10px;">WhatsApp</th>
@@ -195,7 +199,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td colspan="6" class="text-center" style="padding: 20px; color: #5c6c7b;">Menghubungkan ke Google Sheets...</td></tr>
+            <tr><td colspan="6" class="text-center" style="padding: 20px; color: var(--text-muted);">Menghubungkan ke Google Sheets...</td></tr>
           </tbody>
         </table>
       </div>
@@ -207,5 +211,34 @@
 
 <script src="js/data.js"></script>
 <script src="js/admin.js"></script>
+
+<script>
+  (function() {
+    const toggleBtns = document.querySelectorAll('.btn-theme-toggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        toggleBtns.forEach(btn => btn.innerHTML = '<i class="fa-solid fa-sun"></i>');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        toggleBtns.forEach(btn => btn.innerHTML = '<i class="fa-solid fa-moon"></i>');
+      }
+    }
+
+    applyTheme(currentTheme);
+
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        let theme = document.documentElement.getAttribute('data-theme');
+        let newTheme = theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+      });
+    });
+  })();
+</script>
 </body>
 </html>

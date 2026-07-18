@@ -19,34 +19,34 @@
 <!-- ==================== SVG SPRITE (signature geometric motifs) ==================== -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="star-mark" viewBox="0 0 64 64">
-    <circle cx="32" cy="32" r="31" fill="#2a7a65"/>
-    <g fill="none" stroke="#faedcd" stroke-width="2">
+    <circle cx="32" cy="32" r="31" fill="var(--primary-deep)"/>
+    <g fill="none" stroke="var(--accent-light)" stroke-width="2">
       <rect x="15" y="15" width="34" height="34"/>
       <rect x="15" y="15" width="34" height="34" transform="rotate(45 32 32)"/>
     </g>
-    <circle cx="32" cy="32" r="6" fill="#faedcd"/>
+    <circle cx="32" cy="32" r="6" fill="var(--accent-light)"/>
   </symbol>
   <symbol id="corner-ornament" viewBox="0 0 40 40">
-    <path d="M2 20 V6 a4 4 0 0 1 4-4 H20" fill="none" stroke="#d4a373" stroke-width="1.6"/>
-    <rect x="9" y="9" width="9" height="9" transform="rotate(45 13.5 13.5)" fill="none" stroke="#d4a373" stroke-width="1.4"/>
+    <path d="M2 20 V6 a4 4 0 0 1 4-4 H20" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+    <rect x="9" y="9" width="9" height="9" transform="rotate(45 13.5 13.5)" fill="none" stroke="var(--accent)" stroke-width="1.4"/>
   </symbol>
   <symbol id="hero-art" viewBox="0 0 480 600">
     <rect width="480" height="600" fill="none"/>
     <g opacity=".9">
-      <path d="M0 460 h480 v140 H0 Z" fill="#246654"/>
-      <path d="M60 460 v-90 a180 180 0 0 1 360 0 v90 Z" fill="#358f77"/>
-      <path d="M60 460 v-90 a180 180 0 0 1 360 0 v90 Z" fill="none" stroke="#faedcd" stroke-width="2" opacity=".5"/>
-      <circle cx="240" cy="250" r="46" fill="#358f77" stroke="#faedcd" stroke-width="2"/>
-      <path d="M240 165 v-38 M226 141 h28" stroke="#faedcd" stroke-width="3" stroke-linecap="round"/>
-      <path d="M150 460 v-150 h30 v150 Z M300 460 v-150 h30 v150 Z" fill="#2a7a65" opacity=".8"/>
-      <circle cx="165" cy="250" r="42" fill="none" stroke="#faedcd" stroke-width="2" opacity=".55"/>
-      <path d="M165 225 v-25 M152 200 h26" stroke="#faedcd" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
-      <circle cx="315" cy="250" r="42" fill="none" stroke="#faedcd" stroke-width="2" opacity=".55"/>
-      <path d="M315 225 v-25 M302 200 h26" stroke="#faedcd" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
-      <g stroke="#faedcd" stroke-width="1.2" opacity=".35">
+      <path d="M0 460 h480 v140 H0 Z" fill="var(--primary-deep)"/>
+      <path d="M60 460 v-90 a180 180 0 0 1 360 0 v90 Z" fill="var(--primary)"/>
+      <path d="M60 460 v-90 a180 180 0 0 1 360 0 v90 Z" fill="none" stroke="var(--accent-light)" stroke-width="2" opacity=".5"/>
+      <circle cx="240" cy="250" r="46" fill="var(--primary)" stroke="var(--accent-light)" stroke-width="2"/>
+      <path d="M240 165 v-38 M226 141 h28" stroke="var(--accent-light)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M150 460 v-150 h30 v150 Z M300 460 v-150 h30 v150 Z" fill="var(--primary-deep)" opacity=".8"/>
+      <circle cx="165" cy="250" r="42" fill="none" stroke="var(--accent-light)" stroke-width="2" opacity=".55"/>
+      <path d="M165 225 v-25 M152 200 h26" stroke="var(--accent-light)" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+      <circle cx="315" cy="250" r="42" fill="none" stroke="var(--accent-light)" stroke-width="2" opacity=".55"/>
+      <path d="M315 225 v-25 M302 200 h26" stroke="var(--accent-light)" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+      <g stroke="var(--accent-light)" stroke-width="1.2" opacity=".35">
         <path d="M60 380 h360 M60 340 h360"/>
       </g>
-      <g fill="#faedcd" opacity=".8">
+      <g fill="var(--accent-light)" opacity=".8">
         <circle cx="40" cy="60" r="1.6"/><circle cx="80" cy="90" r="1.6"/><circle cx="120" cy="50" r="1.6"/>
         <circle cx="380" cy="70" r="1.6"/><circle cx="420" cy="110" r="1.6"/><circle cx="350" cy="120" r="1.6"/>
       </g>
@@ -58,7 +58,7 @@
 <header class="site-header">
   <div class="container nav">
     <a href="#beranda" class="brand">
-      <img class="brand-mark" src="assets/image/putih.png" alt="Logo Sulaimaniyah Institute" />
+      <img class="brand-mark" src="assets/image/sulaimaniyah.png" alt="Logo Sulaimaniyah Institute" />
       <span class="brand-text">
         <strong>Ponpes. Ukhuwah Islamiyah</strong>
         <span>Sulaimaniyah Institute</span>
@@ -76,12 +76,17 @@
     </nav>
 
     <div class="nav-cta">
+      <!-- TOMBOL DARK/LIGHT MODE -->
+      <button id="themeToggle" class="btn-theme-toggle" aria-label="Ganti Tema">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+
       <select id="languageSwitcher" class="lang-switcher" aria-label="Pilih Bahasa">
-        <option value="id">ID</option>
-        <option value="en">EN</option>
-        <option value="tr">TR</option>
+        <option value="id" style="color:var(--text-main);background:var(--bg-main);">ID</option>
+        <option value="en" style="color:var(--text-main);background:var(--bg-main);">EN</option>
+        <option value="tr" style="color:var(--text-main);background:var(--bg-main);">TR</option>
       </select>
-      <a href="https://script.google.com/macros/s/AKfycbxZH0xpo0MbJHlAeIB3NntJ_ItyDKRrobvOrM9YGnm0BiR2CP-2OiLQPLO2JiLP1DXa9Q/exec" target="_blank" class="btn btn-outline-light"><span data-i18n="btnDaftarSekarang">Daftar Sekarang</span> <i class="fa-solid fa-arrow-right"></i></a>
+      <a href="https://script.google.com/macros/s/AKfycbxZH0xpo0MbJHlAeIB3NntJ_ItyDKRrobvOrM9YGnm0BiR2CP-2OiLQPLO2JiLP1DXa9Q/exec" target="_blank" class="btn btn-primary btn-alt"><span data-i18n="btnDaftarSekarang">Daftar Sekarang</span> <i class="fa-solid fa-arrow-right"></i></a>
       <button class="nav-toggle" id="navToggle" aria-label="Buka menu" aria-expanded="false">
         <i class="fa-solid fa-bars"></i>
       </button>
@@ -141,7 +146,7 @@
           <div class="ornament br"><svg><use href="#corner-ornament"/></svg></div>
           <div style="padding:24px">
             <p class="eyebrow" style="margin-bottom:10px" data-i18n="visiTitle">Visi</p>
-            <p id="aboutVisi" style="font-weight:600;color:var(--emerald-deep)"></p>
+            <p id="aboutVisi" style="font-weight:600;color:var(--primary-deep)"></p>
           </div>
         </div>
       </div>
@@ -149,7 +154,7 @@
   </section>
 
   <!-- ==================== FASILITAS ==================== -->
-  <section class="section facilities girih-bg" id="fasilitas">
+  <section class="section facilities girih-bg" id="fasilitas" style="background:var(--bg-main)">
     <div class="container">
       <div class="section-head center reveal">
         <p class="eyebrow" style="justify-content:center">مرافق</p>
@@ -175,7 +180,7 @@
   </section>
 
   <!-- ==================== INFORMASI / BERITA ==================== -->
-  <section class="section" id="informasi" style="background:var(--parchment)">
+  <section class="section alt-section" id="informasi" style="background:var(--bg-main)">
     <div class="container">
       <div class="section-head reveal">
         <p class="eyebrow">أخبار</p>
@@ -204,11 +209,11 @@
           <div class="qris-box" style="text-align: center;"> <img src="assets/image/QRIS_BSI.png"
                  alt="QRIS Donasi Pesantren Sulaimaniyah"
                  style="width:100%; max-width:250px; height:auto; border-radius:8px; display: block; margin-inline: auto;" />
-            <p style="font-size:.78rem;color:#5c6c7b"><b>A01</b></p>
-            <p style="font-size:.78rem;color:#5c6c7b">NMID: ID2023253871628</p>
-            <p style="margin-top:12px; font-weight:700; color:var(--emerald-deep);" data-i18n="donasiScanQris">Scan QRIS Donasi</p>
+            <p style="font-size:.78rem;color:var(--text-muted)"><b>A01</b></p>
+            <p style="font-size:.78rem;color:var(--text-muted)">NMID: ID2023253871628</p>
+            <p style="margin-top:12px; font-weight:700; color:var(--primary-deep);" data-i18n="donasiScanQris">Scan QRIS Donasi</p>
           </div>
-          <p style="font-size:.8rem;color:#CFE0D8;margin-top:16px"><i class="fa-solid fa-shield-heart"></i>&nbsp; <span data-i18n="donasiKonfirmasiNote">Setelah transfer, mohon isi formulir konfirmasi di samping agar donasi Anda tercatat dengan baik.</span></p>
+          <p style="font-size:.8rem;color:var(--text-inverse);margin-top:16px"><i class="fa-solid fa-shield-heart"></i>&nbsp; <span data-i18n="donasiKonfirmasiNote">Setelah transfer, mohon isi formulir konfirmasi di samping agar donasi Anda tercatat dengan baik.</span></p>
         </div>
 
         <form class="form-card" id="formDonasi">
@@ -251,7 +256,7 @@
   </section>
 
   <!-- ==================== TESTIMONI ==================== -->
-  <section class="section testi" id="testimoni">
+  <section class="section testi" id="testimoni" style="background:var(--bg-main)">
     <div class="container">
       <div class="section-head center reveal">
         <p class="eyebrow" style="justify-content:center">آراء</p>
@@ -280,7 +285,7 @@
   </section>
 
   <!-- ==================== KONTAK ==================== -->
-  <section class="section" id="kontak" style="background:var(--parchment)">
+  <section class="section" id="kontak" style="background:var(--bg-main)">
     <div class="container contact-grid">
       <div class="reveal">
         <p class="eyebrow">تواصل</p>
@@ -355,11 +360,40 @@
     <button class="news-modal-close" id="newsModalClose" aria-label="Tutup">&times;</button>
     <p class="eyebrow" id="newsModalMeta"></p>
     <h3 id="newsModalTitle" style="margin-bottom:14px"></h3>
-    <p id="newsModalBody" style="color:#4d5d6d;font-size:.94rem;line-height:1.7"></p>
+    <p id="newsModalBody" style="color:var(--text-muted);font-size:.94rem;line-height:1.7"></p>
   </div>
 </div>
 
 <script src="js/data.js"></script>
 <script src="js/main.js"></script>
+
+<!-- THEME TOGGLE SCRIPT -->
+<script>
+  (function() {
+    const toggleBtn = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if(toggleBtn) toggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        if(toggleBtn) toggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      }
+    }
+
+    applyTheme(currentTheme);
+
+    if(toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme');
+        let newTheme = theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
+      });
+    }
+  })();
+</script>
 </body>
 </html>
